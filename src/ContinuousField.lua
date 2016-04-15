@@ -4,7 +4,15 @@ require 'utils.lua'
 
 local ContinuousField = torch.class('space.ContinuousField');
 
-function ContinuousField:stx(x, width):
+
+function Serengeti:__init(width, height)
+  parent.__init()
+  self.width = width
+  self.height = height
+end
+
+function ContinuousField:stx(x, width)
+  width = width or self.width
   if x >= 0 then
     if x < width then
       return x
@@ -15,7 +23,7 @@ function ContinuousField:stx(x, width):
 end
 
 function ContinuousField:tdx(x1, x2, width)
-  
+
   if math.abs(x1- x2) <= (width / 2) then
     return x1 - x2
   end
@@ -30,7 +38,8 @@ function ContinuousField:tdx(x1, x2, width)
 
 end
 
-function ContinuousField:sty(y, height):
+function ContinuousField:sty(y, height)
+  height = height or self.height
   if y >= 0 then
     if y < height then
       return y
@@ -57,7 +66,7 @@ function ContinuousField:tdy(y1, y2, height)
 end
 
 
-function ContinuousField:tv()
-
+function ContinuousField:tv(x1, x2, y1, y2)
+  return self:tdx(x1,x2, self.width), self:tdy(y1, y2, self.height)
 end
 

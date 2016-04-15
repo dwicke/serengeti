@@ -24,12 +24,10 @@ function Serengeti:initialization()
   for i = 1, self.numLions do
     self.lions[i] = Lion(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minRotation,self.maxRotation))
   end
-  self.gazelle = Gazelle(max, lions)
+  self.gazelle = Gazelle(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), max, lions, ContinuousField(self.width, self.height))
 end
 
 
--- Move the car
--- action is in set {-1,0,1}
 function Serengeti:step()
 
 
@@ -39,7 +37,7 @@ function Serengeti:step()
     self.lions[i]:step()
   end
 
-  return reward, {self.position, self.velocity}, self.terminal
+  return self.gazelle:isDead()
 end
 
 

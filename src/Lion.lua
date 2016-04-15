@@ -12,6 +12,13 @@ function Lion:__init(xpos, ypos, theta, learner)
   self.learner = learner
 end
 
+function Lion:getX()
+  return self.xpos
+end
+function Lion:getY()
+  return self.ypos
+end
+
 
 function Lion:step()
 
