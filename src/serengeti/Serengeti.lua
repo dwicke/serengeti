@@ -1,11 +1,11 @@
 require 'torch'
 
 
-local Serengeti = torch.class('serengti.Serengeti');
+local Serengeti = torch.class('serengeti.Serengeti');
 
 -- Constructor
 function Serengeti:__init(numLions)
-  parent.__init()
+  --parent.__init()
 
   self.numLions = numLions
   self.width = 10
@@ -13,7 +13,10 @@ function Serengeti:__init(numLions)
   self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
   self.lionJump = 2
   self.gazelleJump = 3
-
+  self.minPosition = 0
+  self.maxPosition = 10
+  self.minRotation = 0
+  self.maxRotation = 360
 end
 
 
@@ -22,8 +25,10 @@ function Serengeti:initialization()
   self.lions = {}
   for i = 1, self.numLions do
     self.lions[i] = Lion(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minRotation,self.maxRotation))
+    print("lions i = " .. i .. " x = " ..self.lions[i]:getX())
   end
-  self.gazelle = Gazelle(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), max, lions, ContinuousField(self.width, self.height))
+
+  self.gazelle = Gazelle(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), self.max, self.lions, serengeti.ContinuousField(self.width, self.height), self.gazelleJump)
 end
 
 

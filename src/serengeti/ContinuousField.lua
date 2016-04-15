@@ -1,11 +1,11 @@
 require 'torch'
 
 
-local ContinuousField = torch.class('serengti.ContinuousField');
+local ContinuousField = torch.class('serengeti.ContinuousField');
 
 
-function Serengeti:__init(width, height)
-  parent.__init()
+function ContinuousField:__init(width, height)
+  --parent.__init()
   self.width = width
   self.height = height
 end

@@ -1,13 +1,12 @@
 require 'torch'
 
 
-local Gazelle = torch.class('serengti.Gazelle');
+local Gazelle = torch.class('Gazelle');
 
 -- Constructor
-function Gazelle:__init(xpos, ypos, theta, maxFieldLength, lions, field, stepSize)
+function Gazelle:__init(xpos, ypos, maxFieldLength, lions, field, stepSize)
   self.xpos = xpos
   self.ypos = ypos
-  self.theta = theta
   self.maxFieldLength = maxFieldLength
   self.lions = lions
   self.field = field
@@ -18,8 +17,8 @@ end
 function Gazelle:step()
   xp = 0.0
   yp = 0.0
-  for l in self.lions do
-    vx, vy = self.field:tv(l:getX(), l:getY(), xpos, ypos)
+  for i, l in ipairs(self.lions) do
+    vx, vy = self.field:tv(l:getX(), l:getY(), self.xpos, self.ypos)
     vLen = math.sqrt(vx*vx + vy*vy)
     scale = (self.maxFieldLength - vLen) / vLen
     xp = xp + vx * scale
@@ -42,9 +41,9 @@ end
 -- returns -1 if not dead
 -- returns 1 if dead
 function Gazelle:isDead()
-
-  for l in self.lions do
-    vx, vy = self.field:tv(l.getX(), l.getY(), self.xpos, self.ypos)
+  print("Checking if Gazelle is dead")
+  for i, l in ipairs(self.lions) do
+    vx, vy = self.field:tv(l:getX(), l:getY(), self.xpos, self.ypos)
     if math.sqrt(vx*vx + vy*vy) <= 1.0 then
       return 1
     end
