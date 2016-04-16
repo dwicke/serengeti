@@ -8,8 +8,8 @@ function Serengeti:__init(numLions)
   --parent.__init()
 
   self.numLions = numLions
-  self.width = 10
-  self.height = 10
+  self.width = 600
+  self.height = 600
   self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
   self.lionJump = 2
   self.gazelleJump = 3
@@ -49,14 +49,14 @@ function Serengeti:getLionCoordinates()
   coords = {}
   print("getting coordinates")
   for i,l in ipairs(self.lions) do
-    coords[i] = {l:getX()*30, l:getY()*30}
+    coords[i] = {l:getX(), l:getY()}
     print("lion[" ..i .. "]  = {" .. coords[i][1] .. ", " .. coords[i][2] .. "}")
   end
   return coords
 end
 
 function Serengeti:getGazelleCoordinates()
-  return {self.gazelle:getX()*30, self.gazelle:getY()*30}
+  return {self.gazelle:getX(), self.gazelle:getY()}
 end
 
 
