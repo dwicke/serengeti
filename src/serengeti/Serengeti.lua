@@ -45,3 +45,19 @@ function Serengeti:step()
 end
 
 
+function Serengeti:getLionCoordinates()
+  coords = {}
+  print("getting coordinates")
+  for i,l in ipairs(self.lions) do
+    coords[i] = {l:getX()*30, l:getY()*30}
+    print("lion[" ..i .. "]  = {" .. coords[i][1] .. ", " .. coords[i][2] .. "}")
+  end
+  return coords
+end
+
+function Serengeti:getGazelleCoordinates()
+  return {self.gazelle:getX()*30, self.gazelle:getY()*30}
+end
+
+
+

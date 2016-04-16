@@ -52,3 +52,12 @@ function Gazelle:isDead()
 end
 
 
+function Gazelle:getX()
+  return self.xpos
+end
+
+function Gazelle:getY()
+  return self.ypos
+end
+
+
