@@ -11,10 +11,14 @@ function Gazelle:__init(xpos, ypos, maxFieldLength, lions, field, stepSize)
   self.lions = lions
   self.field = field
   self.stepSize = stepSize
+  self.dead = -1
 end
 
 
 function Gazelle:step()
+  if self.dead == 1 then
+    return
+  end
   xp = 0.0
   yp = 0.0
   for i, l in ipairs(self.lions) do
@@ -28,7 +32,7 @@ function Gazelle:step()
   yp = -1*yp
 
   len = math.sqrt(xp*xp + yp*yp)
-  if len > 0 then
+  if len > 0.01 then
     xp = xp * (self.stepSize / len)
     yp = yp * (self.stepSize / len)
   else
@@ -43,11 +47,14 @@ end
 function Gazelle:isDead()
   print("Checking if Gazelle is dead")
   for i, l in ipairs(self.lions) do
-    vx, vy = self.field:tv(l:getX(), l:getY(), self.xpos, self.ypos)
-    if math.sqrt(vx*vx + vy*vy) <= 1.0 then
+    vx, vy = self.field:tv(self.xpos, self.ypos, l:getX(), l:getY())
+    print("distance is".. math.sqrt(vx*vx + vy*vy) .. " l(x,y) = ".. l:getX() .. ", " .. l:getY())
+    if math.sqrt(vx*vx + vy*vy) <= 50.0 then
+      self.dead = 1
       return 1
     end
   end
+  self.dead = -1
   return -1
 end
 
