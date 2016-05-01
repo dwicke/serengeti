@@ -9,14 +9,13 @@ function MaxTwoQuadratic:step(action1, action2)
 	--assert(-4<=action2 and action2<= 4,"action2 is not in the valid range")
 
 	local terminal = true
-	local h1 = 100
-	local h2 = 20
-	local s1 = 4.0
-	local s2 = 32.0
-	local f1 = h1*(1 - ((action1/s1)*(action1/s1)) - ((action2/s1)*(action2/s1))) + 200
-	local f2 = h2*(1 - ((action1/s2)*(action1/s2)) - ((action2/s2)*(action2/s2))) + 100
+	local x1,y1,x2,y2 = -10,-10,10,10
+	local h1,h2 = 100,20
+	local s1,s2 = 4.0,32.0
+	local f1 = h1*(1 - (((action1-x1)/s1)*((action1-x1)/s1)) - (((action2-y1)/s1)*((action2-y1)/s1))) + 50
+	local f2 = h2*(1 - (((action1-x2)/s2)*((action1-x2)/s2)) - (((action2-y2)/s2)*((action2-y2)/s2))) - 50
 
-	return math.max(f1,f2,0), terminal
+	return math.max(f1,f2,-150), terminal
 end
 
 
