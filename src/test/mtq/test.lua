@@ -15,8 +15,9 @@ function makeModel(learningRate)
 	
 	local policy1 = rl.GaussianPolicy(1)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
-	local agent1 = rl.Reinforce(model1, policy1, optimizer1)
+	local agent1 = rl.Reinforce(model1, policy1, optimizer1, true)
 	agent1:setLearningRate(learningRate)
+	agent1:initiateParameters(0.8,1.2)
 	
 	
 	local modelMean2 = nn.Sequential():add(nn.Linear(1, 1))
@@ -27,8 +28,9 @@ function makeModel(learningRate)
 	
 	local policy2 = rl.GaussianPolicy(1)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
-	local agent2 = rl.Reinforce(model2, policy2, optimizer2)
+	local agent2 = rl.Reinforce(model2, policy2, optimizer2, true)
 	agent2:setLearningRate(learningRate)
+	agent2:initiateParameters(0.8,1.2)
 	
 	return agent1, agent2
 end
@@ -37,7 +39,7 @@ end
 function main()
 	
 	
-	local agent1, agent2 = makeModel(0.0003)
+	local agent1, agent2 = makeModel(0.003)
 	
 	local state = torch.Tensor({1})
 	
@@ -55,31 +57,32 @@ function main()
 		-- repeat 100 trials
 		for j = 1,100 do
 			agent1:startTrial()
-			agent2:startTrial()
+			--agent2:startTrial()
 			local action1 = agent1:getAction(state)[1]
-			local action2 = agent2:getAction(state)[1]
+			--local action2 = agent2:getAction(state)[1]
 --			print("action1 is")
 --			print(action1)
 --			print("action2 is")
 --			print(action2)
-			local r, _ = game:step(agent1:getAction(state)[1],agent2:getAction(state)[1])
-			--local r, _ = game:step(agent1:getAction(state)[1],-10)
-			--print(r)
+			--local r, _ = game:step(agent1:getAction(state)[1],agent2:getAction(state)[1])
+			local r, _ = game:step(agent1:getAction(state)[1],-10)
+--			if i > 2500 then
+--				print(action1)
+--			end
 			agent1:step(state, r)
-			agent2:step(state, r)
+			--agent2:step(state, r)
 			agent1:endTrial()
-			agent2:endTrial()
+			--agent2:endTrial()
 			average1 = average1 + r
 			average2 = average2 + r
 		end
 		agent1:learn(nil, nil)
-		agent2:learn(nil, nil)
+		--agent2:learn(nil, nil)
 		average1 = average1/100
 		average2 = average2/100
 		if i%50==0 then
 			--print("the norm of gradient is "..optimizer1.grads:norm().." and "..optimizer2.grads:norm())
-			print("average is")
-			print(average1)
+			print("iteration" .. i .. ", average is: "..average1)
 			print("model1")
 			local temp1 = agent1.model:forward(state)
 			print(temp1[1])

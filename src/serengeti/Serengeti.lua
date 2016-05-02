@@ -1,63 +1,97 @@
 require 'torch'
 
 
-local Serengeti = torch.class('serengeti.Serengeti');
+local Serengeti = torch.class('serengeti.Serengeti')
 
 -- Constructor
 function Serengeti:__init(numLions)
-  --parent.__init()
 
-  self.numLions = numLions
-  self.width = 600
-  self.height = 600
-  self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
-  self.lionJump = 1
-  self.gazelleJump = 3
-  self.minPosition = 0
-  self.maxPosition = 600
-  self.field = serengeti.ContinuousField(self.width, self.height)
+	self.numLions = numLions
+	self.width = 600
+	self.height = 600
+	self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
+	self.lionJump = 1
+	self.gazelleJump = 3
+	self.minPosition = 0
+	self.maxPosition = 600
+	self.field = serengeti.ContinuousField(self.width, self.height)
+	self.terminal = true
+
+	self.lions = {}
+	for i = 1, self.numLions do
+		self.lions[i] = Lion(lionJump, self.field)
+	end
+	
+	self.gazelle = Gazelle(self.max, self.lions, self.field, self.gazelleJump)
+end
+
+-- set the position and velocity of the agents
+function Serengeti:reset()
+
+	-- random put the lions and gazelle
+	for i = 1, self.numLions do
+		self.lions[i]:reset(torch.uniform(self.minPosition,self.maxPosition), 
+			torch.uniform(self.minPosition,self.maxPosition),
+			math.random()*2*math.pi)
+		--print("lions i = " .. i .. " x = " ..self.lions[i]:getX())
+	end
+
+	self.gazelle:reset(torch.uniform(self.minPosition,self.maxPosition), 
+		torch.uniform(self.minPosition,self.maxPosition))
+		
+	self.terminal = false
+
+	local coords = self:getLionCoordinates()
+	local gazelle = self:getGazelleCoordinates()
+	
+	for i = 1,#gazelle do
+		table.insert(coords, gazelle[i])
+	end
+	
+	return coords
+
 end
 
 
--- set the position and velocity of the robot
-function Serengeti:initialization()
-  self.lions = {}
+function Serengeti:step(actions)
 
-  for i = 1, self.numLions do
-    self.lions[i] = Lion(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), math.random()*2*math.pi, lionJump, self.field)
-    print("lions i = " .. i .. " x = " ..self.lions[i]:getX())
-  end
+	local reward = -1
 
-  self.gazelle = Gazelle(torch.uniform(self.minPosition,self.maxPosition), torch.uniform(self.minPosition,self.maxPosition), self.max, self.lions, self.field, self.gazelleJump)
-end
+	self.gazelle:step()
 
+	for i = 1, self.numLions do
+		self.lions[i]:step(actions[i])
+	end
 
-function Serengeti:step()
+	if self.gazelle:isDead() then
+		self.terminal = true
+	end
 
-
-  self.gazelle:step()
-
-  for i = 1, self.numLions do
-    self.lions[i]:step()
-  end
-
-  return self.gazelle:isDead()
+	local coords = self:getLionCoordinates()
+	local gazelle = self:getGazelleCoordinates()
+	
+	for i = 1,#gazelle do
+		table.insert(coords, gazelle[i])
+	end
+	
+	return reward, coords, self.terminal
 end
 
 
 function Serengeti:getLionCoordinates()
-  coords = {}
-  print("getting coordinates")
-  for i,l in ipairs(self.lions) do
-    coords[i] = {l:getX(), l:getY()}
-    --print("lion[" ..i .. "]  = {" .. coords[i][1] .. ", " .. coords[i][2] .. "}")
-  end
-  return coords
+	local coords = {}
+	--print("getting coordinates")
+	for i,l in ipairs(self.lions) do
+		table.insert(coords, l:getX())
+		table.insert(coords, l:getY())
+	end
+	--print(coords)
+	return coords
 end
 
 function Serengeti:getGazelleCoordinates()
-  print("gaz x = " .. self.gazelle:getX() .. " y = " .. self.gazelle:getY())
-  return {self.gazelle:getX(), self.gazelle:getY()}
+	--print("gaz x = " .. self.gazelle:getX() .. " y = " .. self.gazelle:getY())
+	return {self.gazelle:getX(), self.gazelle:getY()}
 end
 
 
