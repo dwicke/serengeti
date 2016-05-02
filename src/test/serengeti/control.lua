@@ -76,7 +76,7 @@ function step(iterationsLimit, trajectoriesLimit)
 		
 		-- only learn after so many trajectories collected
 		if trialCounter == trajectoriesLimit then
-			utils.callFunctionOnObjects("learn", {{nil, nil}})
+			utils.callFunctionOnObjects("learn", agents, {{nil, nil}})
 
 			print("learn once")
 			
