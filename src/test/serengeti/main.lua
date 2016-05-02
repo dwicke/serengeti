@@ -3,7 +3,7 @@ package.path = package.path..";../?.lua"
 require 'torch'
 require 'serengeti'
 
-s = serengeti.Serengeti(2000)
+s = serengeti.Serengeti(3)
 isDead = -1
 
 -- gets called once at the very beginning
@@ -26,8 +26,8 @@ function love.draw()
       love.graphics.circle("fill", coords[1], coords[2], 15, 100)
     end
     --love.graphics.circle("fill", 300, 300, 15, 100) -- Draw white circle with 100 segments.
-    --love.graphics.setColor(255, 0, 0)
-    --love.graphics.circle("fill", 300, 300, 50, 5)   -- Draw red circle with five segments.
+    love.graphics.setColor(0, 0, 255)
+    love.graphics.circle("fill", 300, 300, 50, 5)   -- Draw red circle with five segments.
 
 
     -- draw the gazelle (green circle)

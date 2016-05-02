@@ -41,6 +41,10 @@ function Serengeti:step()
     self.lions[i]:step()
   end
 
+  --for i = 1, self.numLions do
+    --self.lions[i]:checkDist()
+  --end
+
   return self.gazelle:isDead()
 end
 
