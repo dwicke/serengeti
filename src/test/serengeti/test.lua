@@ -7,14 +7,14 @@ require 'test.serengeti.control'
 
 
 local iterations = 4000
-
+local sampleSize = 100
 function main()
 	local sim = init()
 
 	local finished = false
 	
 	while not finished do
-		finished = step(iteration)
+		finished = step(iterations, sampleSize)
 	end
 
 end

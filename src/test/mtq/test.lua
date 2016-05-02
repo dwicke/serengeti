@@ -57,9 +57,9 @@ function main()
 		-- repeat 100 trials
 		for j = 1,100 do
 			agent1:startTrial()
-			--agent2:startTrial()
+			agent2:startTrial()
 			local action1 = agent1:getAction(state)[1]
-			--local action2 = agent2:getAction(state)[1]
+			local action2 = agent2:getAction(state)[1]
 --			print("action1 is")
 --			print(action1)
 --			print("action2 is")
@@ -70,14 +70,14 @@ function main()
 --				print(action1)
 --			end
 			agent1:step(state, r)
-			--agent2:step(state, r)
+			agent2:step(state, r)
 			agent1:endTrial()
-			--agent2:endTrial()
+			agent2:endTrial()
 			average1 = average1 + r
 			average2 = average2 + r
 		end
 		agent1:learn(nil, nil)
-		--agent2:learn(nil, nil)
+		agent2:learn(nil, nil)
 		average1 = average1/100
 		average2 = average2/100
 		if i%50==0 then

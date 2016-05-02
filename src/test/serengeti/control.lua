@@ -58,6 +58,7 @@ function step(iterationsLimit, trajectoriesLimit)
 	print("action")
 	local actions = utils.callFunctionOnObjects("getAction", agents, {{state}})
 	print("post action")
+	
 	local r, sprime, t = sim:step(actions) -- take a step for four lions 
 
 	utils.callFunctionOnObjects("step", agents, {{state, r}})
