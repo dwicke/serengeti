@@ -7,23 +7,24 @@ local Serengeti = torch.class('serengeti.Serengeti')
 function Serengeti:__init(numLions)
 
 	self.numLions = numLions
-	self.width = 600
-	self.height = 600
+	self.width = 200
+	self.height = 200
 	self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
 	self.lionJump = 1
 	self.gazelleJump = 3
 	self.minPosition = 0
-	self.maxPosition = 600
+	self.maxPosition = 200
 	self.field = serengeti.ContinuousField(self.width, self.height)
-	self.terminal = true
+	self.terminal = false
 
 	self.lions = {}
 	for i = 1, self.numLions do
-		self.lions[i] = Lion(lionJump, self.field)
+		self.lions[i] = Lion(self.lionJump, self.field)
 	end
 	
 	self.gazelle = Gazelle(self.max, self.lions, self.field, self.gazelleJump)
 end
+
 
 -- set the position and velocity of the agents
 function Serengeti:reset()
@@ -95,5 +96,7 @@ function Serengeti:getGazelleCoordinates()
 	return {self.gazelle:getX(), self.gazelle:getY()}
 end
 
-
+function Serengeti:getIsTerminal()
+	return self.terminal
+end
 

@@ -1,34 +1,53 @@
 package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 require 'torch'
-require 'serengeti'
+require 'control'
 
 
-s = serengeti.Serengeti(4)
-isDead = -1
+local stepInteval = nil
+local stepTimer = nil
+local s = nil
+local isDead = nil
 
 -- gets called once at the very beginning
 function love.load()
-	s:initialization()
+  s = init()
+
+  stepInteval = 0.05 -- second
+  stepTimer = stepInteval
 end
 
-function love.update()
-	isDead = s:step()
-	print("is Dead = " .. isDead)
+function love.update(dt)
+	stepTimer = stepTimer - dt
+
+  -- time is up, need to take a step
+  if stepTimer < 0 then
+    -- one step in simulation
+    step()
+
+    -- reset the timer
+    stepTimer = stepInteval
+  end
 end
 
 function love.draw()
 
-	if isDead == -1 then
+  --print("is terminal = " .. tostring(s:getIsTerminal()))
+	if not s:getIsTerminal() then
+
 		love.graphics.setColor(255, 0,0)
 		-- draw the lions (red circle)
 
+    local last = 0.0
 		for i, coords in ipairs(s:getLionCoordinates()) do
-			love.graphics.circle("fill", coords[1], coords[2], 15, 100)
+      --print("coords = " .. tostring(coords) .. " " .. tostring(i))
+      if (i % 2) == 0 then
+        love.graphics.circle("fill", last, coords, 15, 100)
+      else
+        last = coords
+      end
 		end
-		--love.graphics.circle("fill", 300, 300, 15, 100) -- Draw white circle with 100 segments.
-		--love.graphics.setColor(255, 0, 0)
-		--love.graphics.circle("fill", 300, 300, 50, 5)   -- Draw red circle with five segments.
+
 
 
 		-- draw the gazelle (green circle)
@@ -37,7 +56,7 @@ function love.draw()
 		love.graphics.circle("fill", gazelleCoords[1], gazelleCoords[2], 15, 100) -- Draw white circle with 100 segments.
 
 		love.graphics.setColor(255,255,255)
-		love.graphics.polygon('line', 0,0, 600,0, 600,600, 0,600)
+		love.graphics.polygon('line', 0,0, 200,0, 200,200, 0,200)
 	end
 	--love.graphics.translate(10 + i, 10)
 	--love.graphics.print("Text", 5, 5)   -- will effectively render at 15x15

@@ -5,8 +5,8 @@ local Gazelle = torch.class('Gazelle')
 
 -- Constructor
 function Gazelle:__init(maxFieldLength, lions, field, stepSize)
-	self.xpos = 0
-	self.ypos = 0
+	self.xpos = maxFieldLength / 2
+	self.ypos = maxFieldLength /2
 	self.maxFieldLength = maxFieldLength
 	self.lions = lions
 	self.field = field
@@ -18,6 +18,7 @@ end
 function Gazelle:reset(xpos, ypos)
 	self.xpos = xpos
 	self.ypos = ypos
+	self.dead = -1
 end
 
 function Gazelle:step()
@@ -50,17 +51,18 @@ end
 -- returns -1 if not dead
 -- returns 1 if dead
 function Gazelle:isDead()
-	print("Checking if Gazelle is dead")
+	--print("Checking if Gazelle is dead")
 	for i, l in ipairs(self.lions) do
-		vx, vy = self.field:tv(self.xpos, self.ypos, l:getX(), l:getY())
+		vx, vy = self.field:tv(self.xpos, l:getX(), self.ypos, l:getY())
 		print("distance is".. math.sqrt(vx*vx + vy*vy) .. " l(x,y) = ".. l:getX() .. ", " .. l:getY())
 		if math.sqrt(vx*vx + vy*vy) <= 50.0 then
 			self.dead = 1
-			return 1
+			print("Gazelle is dead")
+			return true
 		end
 	end
 	self.dead = -1
-	return -1
+	return false
 end
 
 

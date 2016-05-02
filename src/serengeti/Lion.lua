@@ -29,10 +29,15 @@ function Lion:getY()
 end
 
 
-function Lion:step()
-	dir = self:rotate(self.maxStep, 0, math.random()*2*math.pi)
+function Lion:step(action)
+	--dir = self:rotate(self.maxStep, 0, math.random()*2*math.pi)
+	dir = self:rotate(self.maxStep, 0, action[1])
+	oldx = self.xpos
+	oldy = self.ypos
 	self.xpos = self.field:stx(self.xpos + dir[1])
 	self.ypos = self.field:sty(self.ypos + dir[2])
+
+	--print("action " .. action[1] .. "  old (x, y) = " .. oldx .. ", " .. oldy .. " new x,y = " .. self.xpos .. ", " .. self.ypos)
 	--xpos = self.field:stx(self.xpos + dir[1])
 	--ypos = self.field:sty(self.ypos + dir[2])
 	--print("dist = " math.sqrt((xpos - self.xpos)*(xpos - self.xpos) + (ypos - self.ypos)*(ypos - self.ypos)))
@@ -44,7 +49,7 @@ end
 function Lion:rotate(x, y, theta)
 	sinTheta = math.sin(theta)
 	cosTheta = math.cos(theta)
-	xp = cosTheta * self.xpos + -sinTheta * self.ypos
-	yp = sinTheta * self.xpos + cosTheta * self.ypos
+	xp = cosTheta * x + -sinTheta * y
+	yp = sinTheta * x + cosTheta * y
 	return {xp, yp}
 end

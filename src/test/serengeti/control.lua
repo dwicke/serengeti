@@ -41,7 +41,11 @@ function init()
 	for i = 1,4 do
 		table.insert(agents, buildAgent(learningRate))
 	end
-	
+
+	state = torch.Tensor(sim:reset())
+	-- this is for the episodic method
+	utils.callFunctionOnObjects("startTrial", agents)
+
 	return sim 
 end
 
@@ -55,9 +59,9 @@ function step(iterationsLimit, trajectoriesLimit)
 		utils.callFunctionOnObjects("startTrial", agents)
 	end
 	
-	print("action")
+	--print("action")
 	local actions = utils.callFunctionOnObjects("getAction", agents, {{state}})
-	print("post action")
+	--print("post action")
 	
 	local r, sprime, t = sim:step(actions) -- take a step for four lions 
 
@@ -71,7 +75,7 @@ function step(iterationsLimit, trajectoriesLimit)
 	-- for episodic method
 	if t then
 		utils.callFunctionOnObjects("endTrial", agents)
-
+		sim:reset()
 		trialCounter = trialCounter + 1
 		
 		-- only learn after so many trajectories collected
