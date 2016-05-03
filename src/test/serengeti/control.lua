@@ -18,6 +18,7 @@ local state = nil
 local trialCounter = 0
 local trainingCounter = 0
 local averageReward = 0
+local numSteps = 0
 
 
 function buildAgent(learningRate)
@@ -34,8 +35,8 @@ function buildAgent(learningRate)
 end
 
 
-function init()
-	sim = serengeti.Serengeti(4)
+function init(numLions, size)
+	sim = serengeti.Serengeti(numLions, size)
 	
 	-- put the four identical agents into the table
 	for i = 1,4 do
@@ -68,6 +69,7 @@ function step(iterationsLimit, trajectoriesLimit)
 	utils.callFunctionOnObjects("step", agents, {{state, r}})
 	
 	averageReward = averageReward + r
+	numSteps = numSteps + 1
 
 	-- go the the next state	
 	state = torch.Tensor(sprime)
@@ -87,7 +89,8 @@ function step(iterationsLimit, trajectoriesLimit)
 			trainingCounter = trainingCounter + 1
 			trialCounter = 0
 			
-			print("average is ".. (averageReward/300.0))
+			print("average is ".. (averageReward/trajectoriesLimit))
+			numSteps = 0
 			averageReward = 0
 			
 			-- training is finished

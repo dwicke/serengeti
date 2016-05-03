@@ -4,16 +4,16 @@ require 'torch'
 local Serengeti = torch.class('serengeti.Serengeti')
 
 -- Constructor
-function Serengeti:__init(numLions)
+function Serengeti:__init(numLions, size)
 
 	self.numLions = numLions
-	self.width = 200
-	self.height = 200
+	self.width = size
+	self.height = size
 	self.max = math.sqrt((self.width/2)*(self.width/2) + (self.height/2)*(self.height/2))
 	self.lionJump = 1
 	self.gazelleJump = 3
 	self.minPosition = 0
-	self.maxPosition = 200
+	self.maxPosition = size
 	self.field = serengeti.ContinuousField(self.width, self.height)
 	self.terminal = false
 
@@ -64,8 +64,16 @@ function Serengeti:step(actions)
 		self.lions[i]:step(actions[i])
 	end
 
+	for i = 1, self.numLions do
+		for j = i+1, self.numLions do
+			reward = reward + self.lions[i]:colidedWith(self.lions[j])
+		end
+	end
+
+
 	if self.gazelle:isDead() then
 		self.terminal = true
+		reward = 1
 	end
 
 	local coords = self:getLionCoordinates()

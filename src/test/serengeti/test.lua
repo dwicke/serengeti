@@ -9,7 +9,7 @@ require 'test.serengeti.control'
 local iterations = 4000
 local sampleSize = 10
 function main()
-	local sim = init()
+	local sim = init(4, 10)
 
 	local finished = false
 	

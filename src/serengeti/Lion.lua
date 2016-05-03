@@ -14,9 +14,9 @@ function Lion:__init(maxStep, field)
 end
 
 function Lion:reset(xpos, ypos, theta)
-	self.xpos = xpos
-	self.ypos = ypos
-	self.theta = theta
+	self.xpos = 0--xpos
+	self.ypos = 0--ypos
+	self.theta = 0--theta
 end
 
 function Lion:getX()
@@ -44,6 +44,13 @@ function Lion:step(action)
 
 end
 
+function Lion:colidedWith(l)
+	vx, vy = self.field:tv(self.xpos, l:getX(), self.ypos, l:getY())
+	if math.sqrt(vx*vx + vy*vy) <= 2.0 then
+			return -10.0
+	end
+	return 0.0
+end
 
 
 function Lion:rotate(x, y, theta)
