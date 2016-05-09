@@ -20,7 +20,7 @@ function makeModel(learningRate)
 	
 	local policy1 = rl.GaussianPolicy(1, 8)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
-	local agent1 = rl.Reinforce(model1, policy1, optimizer1, true)
+	local agent1 = rl.GPOMDP(model1, policy1, optimizer1)
 	agent1:setLearningRate(learningRate)
 	agent1:initiateParameters(0.8,1.2)
 	
@@ -35,7 +35,7 @@ function makeModel(learningRate)
 	
 	local policy2 = rl.GaussianPolicy(1, 8)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
-	local agent2 = rl.Reinforce(model2, policy2, optimizer2, true)
+	local agent2 = rl.GPOMDP(model2, policy2, optimizer2)
 	agent2:setLearningRate(learningRate)
 	agent2:initiateParameters(0.8,1.2)
 	
@@ -72,8 +72,8 @@ function main()
 --			print(action1)
 --			print("action2 is")
 --			print(action2)
-			--local r, _ = game:step(agent1:getAction(state)[1],agent2:getAction(state)[1])
-			local r, _ = game:step(agent1:getAction(state)[1],-10)
+			local r, _ = game:step(agent1:getAction(state)[1],agent2:getAction(state)[1])
+			--local r, _ = game:step(agent1:getAction(state)[1],-10)
 --			if i > 2500 then
 --				print(action1)
 --			end
