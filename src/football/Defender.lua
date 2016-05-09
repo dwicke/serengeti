@@ -41,17 +41,16 @@ end
 -- to the beginning and end of the first segment and the next two points correspond
 -- to the second segment that wraps around to the other side of the field.
 -- so if not on the other side of the field.
--- first return value is the number of points
 function Defender:getDefenderPoints()
 
   endX = field:stx(self.xpos + self.defenderLength)
 
   if endX < self.xpos then
     -- then I have wrapped around and need to return 4 points
-    return 4, {{self.xpos, self.ypos}, {self.maxFieldSize, self.ypos},{0, self.ypos}, {endX, self.ypos}}
+    return {{self.xpos, self.ypos}, {self.maxFieldSize, self.ypos},{0, self.ypos}, {endX, self.ypos}}
   end
    -- otherwise I am just a regular two point line segment
-  return 2, {{self.xpos, self.ypos}, {endX, self.ypos}}
+  return {{self.xpos, self.ypos}, {endX, self.ypos}}
 end
 
 

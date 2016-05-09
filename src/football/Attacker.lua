@@ -6,12 +6,15 @@ local Attacker = torch.class('Attacker')
 -- Constructor
 function Attacker:__init(maxFieldSize, field, xpos, ypos)
 
-
+  self.xpos = xpos
+  self.ypos = ypos
+  self.field = field
+  self.maxFieldSize = maxFieldSize
 end
 
 function Attacker:reset(xpos, ypos)
-
-
+  self.xpos = xpos
+  self.ypos = ypos
 end
 
 function Attacker:step(action, defender)
@@ -21,8 +24,44 @@ function Attacker:step(action, defender)
   self.xpos = self.field:stx(self.xpos + dir[1])
   self.ypos = self.field:sty(self.ypos + dir[2])
 
+
+  defenderLoc = defender:getDefenderPoints()
+
+
+  -- if my new x position is greater than the max step size (due to wrapping) then
+  if math.abs(oldx - self.xpos) > self.maxFieldSize then
+    -- create the point at which it wraps around
+
+    if oldx < self.xpos then
+      -- I have wrapped on the low end to the high end
+      -- so then we have x = 0 be the second point
+      -- subtract since y decreases going up...
+      midpointLow = {0, oldy - math.abs(oldx - self.xpos)*math.tan(action[1])}
+      midpointHigh = {self.maxFieldSize, oldy - math.abs(oldx - self.xpos)*math.tan(action[1])}
+    else
+      -- I have wrapped from the high end to the low end
+      midpointLow = {self.maxFieldSize, oldy - math.abs(oldx - self.xpos)*math.tan(action[1])}
+      midpointHigh = {0, oldy - math.abs(oldx - self.xpos)*math.tan(action[1])}
+    end
+
+
+    if #defenderLoc == 2 then
+      intersects = checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
+    else -- it crosses
+      intersects = checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2]) or checkIntersect({oldx, oldy}, midpointLow, defenderLoc[3], defenderLoc[4]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
+    end
+
+  else -- does not wrap around
+    intersects = checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
+
+    if #defenderLoc > 2 then
+      intersects = intersects or checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
+    end
+  end
+
+
   -- now check if I have passed through the defender, and which case I must not move
-  if checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defender:getStart(), defender:getEnd()) == True then
+  if intersects == True then
     self.xpos = oldx
     self.ypos = oldy
   end
