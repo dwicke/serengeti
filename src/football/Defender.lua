@@ -34,3 +34,12 @@ function Defender:step()
   end
   self.xpos = self.xpos + sign
 end
+
+function Defender:getStart()
+
+end
+
+function Defender:getEnd()
+
+end
+
