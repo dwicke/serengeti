@@ -29,7 +29,7 @@ function Gazelle:step()
 	xp = 0.0
 	yp = 0.0
 	for i, l in ipairs(self.lions) do
-		vx, vy = self.field:tv(l:getX(), l:getY(), self.xpos, self.ypos)
+		vx, vy = self.field:tv(l:getX(), self.xpos, l:getY(), self.ypos)
 		vLen = math.sqrt(vx*vx + vy*vy)
 		scale = (self.maxFieldLength - vLen) / vLen
 		xp = xp + vx * scale

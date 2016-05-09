@@ -92,8 +92,14 @@ function Serengeti:getLionCoordinates()
 	local coords = {}
 	--print("getting coordinates")
 	for i,l in ipairs(self.lions) do
+		table.insert(coords, l:getX() * l:getX())
+		table.insert(coords, l:getY() * l:getY())
+
 		table.insert(coords, l:getX())
 		table.insert(coords, l:getY())
+
+		table.insert(coords, l:getX() * l:getY())
+		table.insert(coords, l:getY() * l:getY())
 	end
 	--print(coords)
 	return coords
@@ -107,4 +113,12 @@ end
 function Serengeti:getIsTerminal()
 	return self.terminal
 end
+
+function Serengeti:basisFunction(coords)
+
+
+
+end
+
+
 
