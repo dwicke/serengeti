@@ -34,7 +34,7 @@ function Defender:step()
       end
     end
   end
-  self.xpos = self.xpos + sign
+  self.xpos = self.field:stx(self.xpos + sign)
 end
 
 -- returns a set of four points so defined so that the first two points correspond

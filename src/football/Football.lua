@@ -66,12 +66,24 @@ function Football:step(actions)
   table.insert(coords, self.defender:getX())
   table.insert(coords, self.defender:getY())
 
-
+  self.t = t
   -- return the reward
   return r, coords, t
 end
 
 
+function Football:getAttackers()
+  return self.attackers
+end
 
+function Football:getDefender()
+  return self.defender
+end
 
+function Football:getIsTerminal()
+  return self.t
+end
 
+function Football:getDefenderPoints()
+  return self.defender:getDefenderPoints()
+end

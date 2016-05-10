@@ -8,16 +8,19 @@ require 'control'
 local stepInteval = nil
 local stepTimer = nil
 local s = nil
-local isDead = nil
 local iterations = 4000
 local sampleSize = 5
-local numLions = 4
+local numAttackers = 2
 local fieldSize = 10
-local circleRadius = 3
+local offset = 2
+local defenderStart = 2
+local defenderLength = 6
+local circleRadius = .5
+local scale = 50
 
 -- gets called once at the very beginning
 function love.load()
-  s = init(numLions, fieldSize)
+  s = init(numAttackers, fieldSize, offset, defenderStart, defenderLength)
 
   stepInteval = 0.05 -- second
   stepTimer = stepInteval
@@ -42,27 +45,28 @@ function love.draw()
   if not s:getIsTerminal() then
 
     love.graphics.setColor(255, 0,0)
-    -- draw the lions (red circle)
+    -- draw the attackers (red circle)
 
     local last = 0.0
-    for i, coords in ipairs(s:getLionCoordinates()) do
-      --print("coords = " .. tostring(coords) .. " " .. tostring(i))
-      if (i % 2) == 0 then
-        love.graphics.circle("fill", last, coords, circleRadius, 100)
-      else
-        last = coords
+    for i, atk in ipairs(s:getAttackers()) do
+      love.graphics.circle("fill", atk:getX()*scale, atk:getY()*scale, circleRadius * scale, 100)
+    end
+
+
+
+    -- draw the defender (green circle)
+    love.graphics.setColor(0, 255, 0)
+    pts = s:getDefenderPoints()
+    for i=1, #pts do
+      if (i % 2) == 1 then
+        love.graphics.line(pts[i][1]*scale, pts[i][2]*scale, pts[i+1][1]*scale, pts[i+1][2]*scale)
       end
     end
 
 
 
-    -- draw the gazelle (green circle)
-    love.graphics.setColor(0, 255, 0)
-    gazelleCoords = s:getGazelleCoordinates()
-    love.graphics.circle("fill", gazelleCoords[1], gazelleCoords[2], circleRadius, 100) -- Draw white circle with 100 segments.
-
     love.graphics.setColor(255,255,255)
-    love.graphics.polygon('line', 0,0, fieldSize,0, fieldSize,fieldSize, 0,fieldSize)
+    love.graphics.polygon('line', 0,0, fieldSize*scale,0, fieldSize*scale,fieldSize*scale, 0,fieldSize*scale)
   end
   --love.graphics.translate(10 + i, 10)
   --love.graphics.print("Text", 5, 5)   -- will effectively render at 15x15
