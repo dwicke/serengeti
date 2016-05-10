@@ -39,6 +39,7 @@ function Football:reset()
   table.insert(coords, self.defender:getX())
   table.insert(coords, self.defender:getY())
 
+  self.t = False
 
   return coords
 end
@@ -54,6 +55,9 @@ function Football:step(actions)
     reward, terminate = a:step(actions[i], self.defender)
     r = r + reward
     t = t or terminate -- terminated if one of the attackers reached endzone
+    if t == true then
+      --print("REACHED ENDZONE!!")
+    end
   end
 
   coords = {}
