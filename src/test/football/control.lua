@@ -22,7 +22,7 @@ local numSteps = 0
 
 
 function buildAgent(learningRate)
-  local model = nn.Sequential():add(nn.Linear(10, 7)):add(nn.Sigmoid()):add(nn.Linear(7,1))
+  local model = nn.Sequential():add(nn.Linear(6, 4)):add(nn.Sigmoid()):add(nn.Linear(4,1))
   local policy = rl.GaussianPolicy(1, 1.0)
   local optimizer = rl.StochasticGradientDescent(model:getParameters())
   agent = rl.Reinforce(model, policy, optimizer)
@@ -36,7 +36,7 @@ end
 
 
 function init(numAttackers, size, offset, defenderStart, defenderLength)
-  sim = football.Football(numAttackers, size, offset, defenderStart, defenderLength)
+  sim = Football(numAttackers, size, offset, defenderStart, defenderLength)
 
   -- put the four identical agents into the table
   for i = 1,2 do

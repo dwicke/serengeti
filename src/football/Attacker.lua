@@ -76,7 +76,7 @@ function Attacker:step(action, defender)
 end
 
 
-function Lion:rotate(x, y, theta)
+function Attacker:rotate(x, y, theta)
   sinTheta = math.sin(theta)
   cosTheta = math.cos(theta)
   xp = cosTheta * x + -sinTheta * y
@@ -86,7 +86,7 @@ end
 
 -- Checks if two line segments intersect. Line segments are given in form of ({x,y},{x,y}, {x,y},{x,y}).
 -- taken from https://love2d.org/wiki/General_math
-function checkIntersect(l1p1, l1p2, l2p1, l2p2)
+function Attacker:checkIntersect(l1p1, l1p2, l2p1, l2p2)
   local function checkDir(pt1, pt2, pt3) return math.sign(((pt2.x-pt1.x)*(pt3.y-pt1.y)) - ((pt3.x-pt1.x)*(pt2.y-pt1.y))) end
   return (checkDir(l1p1,l1p2,l2p1) ~= checkDir(l1p1,l1p2,l2p2)) and (checkDir(l2p1,l2p2,l1p1) ~= checkDir(l2p1,l2p2,l1p2))
 end

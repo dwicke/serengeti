@@ -3,3 +3,4 @@ football = {}
 torch.include('football','Football.lua');
 torch.include('football','Attacker.lua');
 torch.include('football','Defender.lua');
+torch.include('football','ContinuousField.lua');

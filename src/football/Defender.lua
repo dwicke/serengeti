@@ -10,7 +10,7 @@ function Defender:__init(maxFieldSize, attackers, field, ypos, defenderLength)
   self.ypos = ypos
   self.xpos = maxFieldSize / 2.5
   self.defenderLength = defenderLength
-  self.maxFieldSize
+  self.maxFieldSize = maxFieldSize
 
 end
 

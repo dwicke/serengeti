@@ -10,11 +10,12 @@ function Football:__init(numAttackers, size, offset, defenderStart, defenderLeng
   self.size = size
   self.offset = offset or 0.0
   self.defenderStart = defenderStart or 5
-  self.field = football.ContinuousField(size, size)
+  self.field = ContinuousField(size, size)
   self.defenderLength = defenderLength
+  self.numAttackers = numAttackers
   self.attackers = {}
   for i = 1, numAttackers do
-    self.attackers = Attacker(self.size, self.field, self.size / i, self.size - self.offset)
+    self.attackers[i] = Attacker(self.size, self.field, self.size / i, self.size - self.offset)
   end
 
 
@@ -23,8 +24,8 @@ function Football:__init(numAttackers, size, offset, defenderStart, defenderLeng
 end
 
 function Football:reset()
-  for i = 1, numAttackers do
-    self.attackers[i]:reset(size / i, size - self.offset)
+  for i = 1, self.numAttackers do
+    self.attackers[i]:reset(self.size / i, self.size - self.offset)
   end
   self.defender:reset(self.defenderStart)
 end
