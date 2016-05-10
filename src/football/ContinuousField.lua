@@ -33,7 +33,7 @@ function ContinuousField:sty(y, height)
 end
 
 function ContinuousField:tdx(x1, x2, width)
-
+  width = width or self.width
   if math.abs(x1- x2) <= (width / 2) then
     return x1 - x2
   end

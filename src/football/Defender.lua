@@ -23,10 +23,10 @@ function Defender:step()
   -- find the agent closest to the defender and move in the x direction toward it one unit
 
   sign = 1
-  minDist = maxFieldSize + 1
+  minDist = self.maxFieldSize + 1
   for i, l in ipairs(self.attackers) do
     if l:getY() - self.ypos < minDist then
-      vx = field:tdx(l:getX(), self.xpos) -- get the dist in the x direction (while wrapping around)
+      vx = self.field:tdx(l:getX(), self.xpos) -- get the dist in the x direction (while wrapping around)
       if vx ~= 0.0 then
         sign = vx / math.abs(vx)
       else
@@ -43,7 +43,7 @@ end
 -- so if not on the other side of the field.
 function Defender:getDefenderPoints()
 
-  endX = field:stx(self.xpos + self.defenderLength)
+  endX = self.field:stx(self.xpos + self.defenderLength)
 
   if endX < self.xpos then
     -- then I have wrapped around and need to return 4 points

@@ -28,6 +28,19 @@ function Football:reset()
     self.attackers[i]:reset(self.size / i, self.size - self.offset)
   end
   self.defender:reset(self.defenderStart)
+
+  coords = {}
+  -- now make the input values
+  for i = 1, #self.attackers do
+    table.insert(coords, self.attackers[i]:getX())
+    table.insert(coords, self.attackers[i]:getY())
+  end
+
+  table.insert(coords, self.defender:getX())
+  table.insert(coords, self.defender:getY())
+
+
+  return coords
 end
 
 

@@ -1,6 +1,6 @@
 require 'torch'
 
-
+math.sign = math.sign or function(x) return x<0 and -1 or x>0 and 1 or 0 end
 local Attacker = torch.class('Attacker')
 
 -- Constructor
@@ -10,6 +10,8 @@ function Attacker:__init(maxFieldSize, field, xpos, ypos)
   self.ypos = ypos
   self.field = field
   self.maxFieldSize = maxFieldSize
+  self.maxStep = 1
+  self.endzone = 0
 end
 
 function Attacker:reset(xpos, ypos)
@@ -46,16 +48,16 @@ function Attacker:step(action, defender)
 
 
     if #defenderLoc == 2 then
-      intersects = checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
+      intersects = self:checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or self:checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
     else -- it crosses
-      intersects = checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2]) or checkIntersect({oldx, oldy}, midpointLow, defenderLoc[3], defenderLoc[4]) or checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
+      intersects = self:checkIntersect({oldx, oldy}, midpointLow, defenderLoc[1], defenderLoc[2]) or self:checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2]) or self:checkIntersect({oldx, oldy}, midpointLow, defenderLoc[3], defenderLoc[4]) or self:checkIntersect(midpointHigh, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
     end
 
   else -- does not wrap around
-    intersects = checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
+    intersects = self:checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[1], defenderLoc[2])
 
     if #defenderLoc > 2 then
-      intersects = intersects or checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
+      intersects = intersects or self:checkIntersect({oldx, oldy}, {self.xpos, self.ypos}, defenderLoc[3], defenderLoc[4])
     end
   end
 
@@ -68,7 +70,7 @@ function Attacker:step(action, defender)
   end
 
   -- and check to see if I have passed into the endzone and in which case return 1
-  if self.ypos < endzone then
+  if self.ypos < self.endzone then
     return 10.0, True -- reached endzone
   end
 
@@ -87,6 +89,16 @@ end
 -- Checks if two line segments intersect. Line segments are given in form of ({x,y},{x,y}, {x,y},{x,y}).
 -- taken from https://love2d.org/wiki/General_math
 function Attacker:checkIntersect(l1p1, l1p2, l2p1, l2p2)
-  local function checkDir(pt1, pt2, pt3) return math.sign(((pt2.x-pt1.x)*(pt3.y-pt1.y)) - ((pt3.x-pt1.x)*(pt2.y-pt1.y))) end
+  local function checkDir(pt1, pt2, pt3) return math.sign(((pt2[1]-pt1[1])*(pt3[2]-pt1[2])) - ((pt3[1]-pt1[1])*(pt2[2]-pt1[2]))) end
   return (checkDir(l1p1,l1p2,l2p1) ~= checkDir(l1p1,l1p2,l2p2)) and (checkDir(l2p1,l2p2,l1p1) ~= checkDir(l2p1,l2p2,l1p2))
 end
+
+
+function Attacker:getX()
+  return self.xpos
+end
+function Attacker:getY()
+  return self.ypos
+end
+
+
