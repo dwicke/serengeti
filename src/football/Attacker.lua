@@ -64,14 +64,15 @@ function Attacker:step(action, defender)
   if intersects == True then
     self.xpos = oldx
     self.ypos = oldy
+    return -30, False -- blocked
   end
 
   -- and check to see if I have passed into the endzone and in which case return 1
   if self.ypos < endzone then
-    return 1.0
+    return 10.0, True -- reached endzone
   end
 
-  return 0.0
+  return -1.0, False -- unblocked
 end
 
 

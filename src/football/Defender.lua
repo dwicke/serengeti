@@ -14,9 +14,9 @@ function Defender:__init(maxFieldSize, attackers, field, ypos, defenderLength)
 
 end
 
-function Defender:reset(xpos, ypos)
+function Defender:reset(ypos)
   self.ypos = ypos
-  self.xpos = xpos
+  self.xpos = self.maxFieldSize / 2.5
 end
 
 function Defender:step()
@@ -53,4 +53,10 @@ function Defender:getDefenderPoints()
   return {{self.xpos, self.ypos}, {endX, self.ypos}}
 end
 
+function Defender:getX()
+  return self.xpos
+end
 
+function Defender:getY()
+  return self.ypos
+end
