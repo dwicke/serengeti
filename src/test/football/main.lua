@@ -2,7 +2,7 @@ package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 package.path = package.path..";../../../PolicyGradient/src/?/init.lua"
 require 'torch'
-require 'control'
+require 'singleAgentTest'
 
 
 local stepInteval = nil
@@ -11,12 +11,19 @@ local s = nil
 local iterations = 4000
 local sampleSize = 5
 local numAttackers = 2
-local fieldSize = 10
+--[[local fieldSize = 10
 local offset = 2
 local defenderStart = 2
-local defenderLength = 6
-local circleRadius = .5
-local scale = 50
+local defenderLength = 6]]--
+
+local numAttackers = 2
+local fieldSize = 2
+local offset = 0
+local defenderStart = 0
+local defenderLength = .5
+
+local circleRadius = .15
+local scale = 100
 
 -- gets called once at the very beginning
 function love.load()

@@ -3,16 +3,16 @@ package.path = package.path..";../../?.lua"
 
 
 
-require 'test.football.control'
+require 'test.football.singleAgentTest'
 
 
-local iterations = 4000
-local sampleSize = 10
+local iterations = 40000
+local sampleSize = 50
 local numAttackers = 2
-local size = 10
-local offset = 2
-local defenderStart = 2
-local defenderLength = 6
+local size = 1
+local offset = 0
+local defenderStart = 0
+local defenderLength = .25
 function main()
   local sim = init(numAttackers, size, offset, defenderStart, defenderLength)
 

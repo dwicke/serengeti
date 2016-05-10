@@ -66,16 +66,16 @@ function Attacker:step(action, defender)
   if intersects == true then
     self.xpos = oldx
     self.ypos = oldy
-    return -30, false -- blocked
+    return -5, false -- blocked
   end
 
   -- and check to see if I have passed into the endzone and in which case return 1
   if self.ypos < self.endzone then
     print("ypos = " .. self.ypos .. " endzone = " .. self.endzone)
-    return 10.0, true -- reached endzone
+    return 40.0, true -- reached endzone
   end
 
-  return -1.0, false -- unblocked
+  return -10.0, false -- unblocked
 end
 
 
