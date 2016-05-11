@@ -58,7 +58,6 @@ function Gazelle:isDead()
 		--print("distance is".. math.sqrt(vx*vx + vy*vy) .. " l(x,y) = ".. l:getX() .. ", " .. l:getY())
 		if math.sqrt(vx*vx + vy*vy) <= self.deathRange then
 			self.dead = 1
-			print("Gazelle is dead")
 			return true
 		end
 	end
