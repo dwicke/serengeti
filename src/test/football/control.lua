@@ -89,7 +89,7 @@ function step(iterationsLimit, trajectoriesLimit)
   state = torch.Tensor(sprime)
   numIters = numIters + 1
   -- for episodic method
-  if t then
+  if t or numIters == 20 then
     utils.callFunctionOnObjects("endTrial", agents)
     --sim:reset()
     --if t then

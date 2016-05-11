@@ -22,16 +22,25 @@ local numSteps = 0
 
 
 function buildAgent(learningRate)
-	local model = nn.Sequential():add(nn.Linear(10, 7)):add(nn.Sigmoid()):add(nn.Linear(7,1))
-	local policy = rl.GaussianPolicy(1, 1.0)
-	local optimizer = rl.StochasticGradientDescent(model:getParameters())
-	--agent = rl.Reinforce(model, policy, optimizer)
-	agent = rl.GPOMDP(model, policy, optimizer)
-	agent:setLearningRate(learningRate)
-	
-	-- NOTE: we may want to initiate the parameters here
-	
-	return agent
+  local modelMean2 = nn.Sequential():add(nn.Linear(15, 1))
+  local modelStdev2 = nn.Sequential():add(nn.Linear(15, 1)):add(nn.Exp())
+  local model2 = nn.ConcatTable()
+  model2:add(modelMean2):add(modelStdev2)
+
+  local model = nn.Sequential():add(nn.Linear(10, 15)):add(nn.Tanh()):add(model2)
+  --local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Sigmoid()):add(nn.Linear(10, 8)):add(nn.Tanh()):add(nn.Linear(8,2))
+
+
+
+  local policy = rl.GaussianPolicy(1)
+  local optimizer = rl.StochasticGradientDescent(model:getParameters())
+  agent = rl.GPOMDP(model, policy, optimizer)
+
+  agent:setLearningRate(learningRate)
+
+  -- NOTE: we may want to initiate the parameters here
+
+  return agent
 end
 
 
