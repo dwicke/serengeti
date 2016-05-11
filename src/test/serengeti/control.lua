@@ -25,8 +25,8 @@ function buildAgent(learningRate)
 	local model = nn.Sequential():add(nn.Linear(10, 7)):add(nn.Sigmoid()):add(nn.Linear(7,1))
 	local policy = rl.GaussianPolicy(1, 1.0)
 	local optimizer = rl.StochasticGradientDescent(model:getParameters())
-	agent = rl.Reinforce(model, policy, optimizer)
-	
+	--agent = rl.Reinforce(model, policy, optimizer)
+	agent = rl.GPOMDP(model, policy, optimizer)
 	agent:setLearningRate(learningRate)
 	
 	-- NOTE: we may want to initiate the parameters here

@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.00000001
+local learningRate = 0.00001
 
 local agents = {}
 local state = nil
@@ -28,7 +28,7 @@ function buildAgent(learningRate)
   local model2 = nn.ConcatTable()
   model2:add(modelMean2):add(modelStdev2)
 
-  local model = nn.Sequential():add(nn.Linear(6, 10)):add(model2)
+  local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Tanh()):add(model2)
   --local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Sigmoid()):add(nn.Linear(10, 8)):add(nn.Tanh()):add(nn.Linear(8,2))
 
 
@@ -76,7 +76,10 @@ function step(iterationsLimit, trajectoriesLimit)
 
   --print("num actions " .. #actions[1])
 
-  local r, sprime, t = sim:step({{actions[1][1]}, {actions[1][2]}}) -- take a step for four lions
+	local action1, action2 = actions[1][1], actions[1][2]
+	
+
+  local r, sprime, t = sim:step({{action1}, {action2}}) -- take a step for four lions
 
   utils.callFunctionOnObjects("step", agents, {{state, r}})
 
@@ -89,7 +92,7 @@ function step(iterationsLimit, trajectoriesLimit)
   -- for episodic method
   if t then
     utils.callFunctionOnObjects("endTrial", agents)
-    sim:reset()
+    --sim:reset()
     --if t then
       trialCounter = trialCounter + 1
     --end
@@ -100,7 +103,7 @@ function step(iterationsLimit, trajectoriesLimit)
       utils.callFunctionOnObjects("learn", agents, {{nil, nil}})
 
       print("learn once")
-
+      
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 

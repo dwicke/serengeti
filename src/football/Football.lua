@@ -17,7 +17,7 @@ function Football:__init(numAttackers, size, offset, defenderStart, defenderLeng
   for i = 1, numAttackers do
     self.attackers[i] = Attacker(self.size, self.field, self.size / i, self.size - self.offset)
   end
-
+	self.terminal = false
 
   self.defender = Defender(self.size, self.attackers, self.field, self.defenderStart, self.defenderLength)
 
@@ -29,7 +29,7 @@ function Football:reset()
   end
   self.defender:reset(self.defenderStart)
 
-  coords = {}
+  local coords = {}
   -- now make the input values
   for i = 1, #self.attackers do
     table.insert(coords, self.attackers[i]:getX())
@@ -39,7 +39,7 @@ function Football:reset()
   table.insert(coords, self.defender:getX())
   table.insert(coords, self.defender:getY())
 
-  self.t = False
+  self.terminal = false
 
   return coords
 end
@@ -48,8 +48,8 @@ end
 function Football:step(actions)
   self.defender:step()
 
-  t = False
-  r = 0.0
+  local t = false
+  local r = 0.0
   -- then step the attackers
   for i, a in ipairs(self.attackers) do
     reward, terminate = a:step(actions[i], self.defender)
@@ -60,7 +60,7 @@ function Football:step(actions)
     end
   end
 
-  coords = {}
+  local coords = {}
   -- now make the input values
   for i = 1, #self.attackers do
     table.insert(coords, self.attackers[i]:getX())
@@ -70,9 +70,9 @@ function Football:step(actions)
   table.insert(coords, self.defender:getX())
   table.insert(coords, self.defender:getY())
 
-  self.t = t
+  self.terminal = t
   -- return the reward
-  return r, coords, t
+  return r, coords, self.terminal
 end
 
 
@@ -85,7 +85,7 @@ function Football:getDefender()
 end
 
 function Football:getIsTerminal()
-  return self.t
+  return self.terminal
 end
 
 function Football:getDefenderPoints()

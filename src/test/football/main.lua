@@ -17,10 +17,10 @@ local defenderStart = 2
 local defenderLength = 6]]--
 
 local numAttackers = 2
-local fieldSize = 2
+local fieldSize = 1
 local offset = 0
 local defenderStart = 0
-local defenderLength = .5
+local defenderLength = .25
 
 local circleRadius = .15
 local scale = 100
