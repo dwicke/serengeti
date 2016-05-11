@@ -57,6 +57,7 @@ function Football:step(actions)
     t = t or terminate -- terminated if one of the attackers reached endzone
     if t == true then
       --print("REACHED ENDZONE!!")
+      break
     end
   end
 
