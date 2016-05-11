@@ -77,7 +77,6 @@ function step(iterationsLimit, trajectoriesLimit)
 	-- for episodic method
 	if t then
 		utils.callFunctionOnObjects("endTrial", agents)
-		sim:reset()
 		trialCounter = trialCounter + 1
 		
 		-- only learn after so many trajectories collected

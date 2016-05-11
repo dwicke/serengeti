@@ -3,7 +3,7 @@ package.path = package.path..";../../?.lua"
 
 
 
-require 'test.football.singleAgentTest'
+require 'test.football.control'
 
 
 local iterations = 40000

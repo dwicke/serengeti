@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.001
+local learningRate = 0.0001
 
 local agents = {}
 local state = nil
@@ -19,13 +19,23 @@ local trialCounter = 0
 local trainingCounter = 0
 local averageReward = 0
 local numSteps = 0
-
+local numIters = 0
+local maxIters = 100
 
 function buildAgent(learningRate)
-  local model = nn.Sequential():add(nn.Linear(6, 4)):add(nn.Sigmoid()):add(nn.Linear(4,1))
-  local policy = rl.GaussianPolicy(1, 1.0)
+  local modelMean2 = nn.Sequential():add(nn.Linear(10, 1))
+  local modelStdev2 = nn.Sequential():add(nn.Linear(10, 1)):add(nn.Exp())
+  local model2 = nn.ConcatTable()
+  model2:add(modelMean2):add(modelStdev2)
+
+  local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Tanh()):add(model2)
+  --local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Sigmoid()):add(nn.Linear(10, 8)):add(nn.Tanh()):add(nn.Linear(8,2))
+
+
+
+  local policy = rl.GaussianPolicy(1)
   local optimizer = rl.StochasticGradientDescent(model:getParameters())
-  agent = rl.Reinforce(model, policy, optimizer)
+  agent = rl.GPOMDP(model, policy, optimizer)
 
   agent:setLearningRate(learningRate)
 
@@ -38,7 +48,7 @@ end
 function init(numAttackers, size, offset, defenderStart, defenderLength)
   sim = Football(numAttackers, size, offset, defenderStart, defenderLength)
 
-  -- put the four identical agents into the table
+  -- put the two identical agents into the table
   for i = 1,2 do
     table.insert(agents, buildAgent(learningRate))
   end
@@ -64,6 +74,10 @@ function step(iterationsLimit, trajectoriesLimit)
   local actions = utils.callFunctionOnObjects("getAction", agents, {{state}})
   --print("post action")
 
+  --print("num actions " .. #actions[1])
+
+
+
   local r, sprime, t = sim:step(actions) -- take a step for four lions
 
   utils.callFunctionOnObjects("step", agents, {{state, r}})
@@ -73,12 +87,15 @@ function step(iterationsLimit, trajectoriesLimit)
 
   -- go the the next state
   state = torch.Tensor(sprime)
-
+  numIters = numIters + 1
   -- for episodic method
   if t then
     utils.callFunctionOnObjects("endTrial", agents)
-    sim:reset()
-    trialCounter = trialCounter + 1
+    --sim:reset()
+    --if t then
+      trialCounter = trialCounter + 1
+    --end
+    numIters = 0
 
     -- only learn after so many trajectories collected
     if trialCounter == trajectoriesLimit then
@@ -89,7 +106,7 @@ function step(iterationsLimit, trajectoriesLimit)
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 
-      print("average is ".. (averageReward/trajectoriesLimit))
+      print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
       numSteps = 0
       averageReward = 0
 

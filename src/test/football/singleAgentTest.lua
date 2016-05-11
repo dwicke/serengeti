@@ -103,7 +103,7 @@ function step(iterationsLimit, trajectoriesLimit)
       utils.callFunctionOnObjects("learn", agents, {{nil, nil}})
 
       print("learn once")
-      
+
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 
