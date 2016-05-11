@@ -21,6 +21,7 @@ local averageReward = 0
 local numSteps = 0
 local numIters = 0
 local maxIters = 100
+local averages = {}
 
 function buildAgent(learningRate)
   local modelMean2 = nn.Sequential():add(nn.Linear(10, 1))
@@ -107,6 +108,7 @@ function step(iterationsLimit, trajectoriesLimit)
       trialCounter = 0
 
       print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
+      averages[trainingCounter] = (averageReward/trajectoriesLimit)
       numSteps = 0
       averageReward = 0
 
@@ -122,4 +124,11 @@ function step(iterationsLimit, trajectoriesLimit)
 
 end
 
-
+function writedata(filename)
+  file = io.open (filename, "w")
+  io.output(file)
+  for i, v in ipairs(averages) do
+    io.output(i .. ", " .. v .. "\n")
+  end
+  io.close(file)
+end

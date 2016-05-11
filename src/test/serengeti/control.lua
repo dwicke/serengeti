@@ -19,6 +19,7 @@ local trialCounter = 0
 local trainingCounter = 0
 local averageReward = 0
 local numSteps = 0
+local averages = {}
 
 
 function buildAgent(learningRate)
@@ -98,6 +99,7 @@ function step(iterationsLimit, trajectoriesLimit)
 			trialCounter = 0
 			
 			print("average is ".. (averageReward/trajectoriesLimit))
+			averages[trainingCounter] = averageReward/trajectoriesLimit
 			numSteps = 0
 			averageReward = 0
 			
@@ -113,4 +115,12 @@ function step(iterationsLimit, trajectoriesLimit)
 	
 end
 
+function writedata(filename)
+	file = io.open (filename, "w")
+	io.output(file)
+	for i, v in ipairs(averages) do
+		io.output(i .. ", " .. v .. "\n")
+	end
+	io.close(file)
+end
 
