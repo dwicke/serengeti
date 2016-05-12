@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.0001
+local learningRate = 0.00001
 
 local agents = {}
 local state = nil
@@ -21,11 +21,10 @@ local averageReward = 0
 local numSteps = 0
 local numIters = 0
 local maxIters = 100
-local averages = {}
 
 function buildAgent(learningRate)
-  local modelMean2 = nn.Sequential():add(nn.Linear(10, 1))
-  local modelStdev2 = nn.Sequential():add(nn.Linear(10, 1)):add(nn.Exp())
+  local modelMean2 = nn.Sequential():add(nn.Linear(10, 2))
+  local modelStdev2 = nn.Sequential():add(nn.Linear(10, 2)):add(nn.Exp())
   local model2 = nn.ConcatTable()
   model2:add(modelMean2):add(modelStdev2)
 
@@ -34,7 +33,7 @@ function buildAgent(learningRate)
 
 
 
-  local policy = rl.GaussianPolicy(1)
+  local policy = rl.GaussianPolicy(2)
   local optimizer = rl.StochasticGradientDescent(model:getParameters())
   agent = rl.GPOMDP(model, policy, optimizer)
 
@@ -49,8 +48,8 @@ end
 function init(numAttackers, size, offset, defenderStart, defenderLength)
   sim = Football(numAttackers, size, offset, defenderStart, defenderLength)
 
-  -- put the two identical agents into the table
-  for i = 1,2 do
+  -- put the four identical agents into the table
+  for i = 1,1 do
     table.insert(agents, buildAgent(learningRate))
   end
 
@@ -77,9 +76,10 @@ function step(iterationsLimit, trajectoriesLimit)
 
   --print("num actions " .. #actions[1])
 
+	local action1, action2 = actions[1][1], actions[1][2]
+	
 
-
-  local r, sprime, t = sim:step(actions) -- take a step for four lions
+  local r, sprime, t = sim:step({{action1}, {action2}}) -- take a step for four lions
 
   utils.callFunctionOnObjects("step", agents, {{state, r}})
 
@@ -90,10 +90,11 @@ function step(iterationsLimit, trajectoriesLimit)
   state = torch.Tensor(sprime)
   numIters = numIters + 1
   -- for episodic method
-  if t or numIters == 20 then
+  if t then
     utils.callFunctionOnObjects("endTrial", agents)
     --sim:reset()
     --if t then
+    sim.terminal = true
       trialCounter = trialCounter + 1
     --end
     numIters = 0
@@ -107,8 +108,7 @@ function step(iterationsLimit, trajectoriesLimit)
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 
-      print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
-      averages[trainingCounter] = (averageReward/trajectoriesLimit)
+      print("average is ".. (averageReward/trajectoriesLimit))
       numSteps = 0
       averageReward = 0
 
@@ -124,11 +124,37 @@ function step(iterationsLimit, trajectoriesLimit)
 
 end
 
+
 function writedata(filename)
   file = io.open (filename, "w")
-  io.output(file)
+
   for i, v in ipairs(averages) do
-    io.output(i .. ", " .. v .. "\n")
+    file:write(i .. ", " .. v .. "\n")
   end
-  io.close(file)
+  file:close()
 end
+
+
+local iterations = 3500
+local sampleSize = 50
+local numAttackers = 2
+local size = 1
+local offset = 0
+local defenderStart = 0
+local defenderLength = .25
+function main()
+  local sim = init(numAttackers, size, offset, defenderStart, defenderLength)
+
+  local finished = false
+
+  while not finished do
+    finished = step(iterations, sampleSize)
+  end
+  writedata("multiagentGPOMDP.out")
+  print("finished writing")
+
+end
+
+
+main()
+

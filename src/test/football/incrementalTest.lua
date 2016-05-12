@@ -3,7 +3,7 @@ package.path = package.path..";../../?.lua"
 
 
 
-require 'test.football.control'
+require 'test.football.testdpg'
 
 
 local iterations = 3500
@@ -18,10 +18,10 @@ function main()
 
   local finished = false
 
-  while not finished do
-    finished = step(iterations, sampleSize)
-  end
-  writedata("multiagentGPOMDP.out")
+  --for i=1, iterations do
+    step(iterations, sampleSize)
+  --end
+  --writedata("multiagentDPG.out")
   print("finished writing")
 
 end
