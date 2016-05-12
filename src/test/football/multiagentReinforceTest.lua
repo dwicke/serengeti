@@ -150,7 +150,7 @@ function main()
   while not finished do
     finished = step(iterations, sampleSize)
   end
-  writedata("multiagentGPOMDP.out")
+  writedata("multiagentReinforce.out")
   print("finished writing")
 
 end
