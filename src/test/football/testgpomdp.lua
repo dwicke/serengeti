@@ -1,3 +1,4 @@
+-- Does not adapt the standard deviation
 package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 
