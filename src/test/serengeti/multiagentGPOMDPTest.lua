@@ -5,7 +5,7 @@ require 'torch'
 require 'rl'
 require 'nn'
 require 'utils'
-require 'football'
+require 'serengeti'
 
 
 local sim = nil
@@ -24,17 +24,17 @@ local maxIters = 100
 local averages = {}
 
 function buildAgent(learningRate)
-  local modelMean2 = nn.Sequential():add(nn.Linear(10, 2))
-  local modelStdev2 = nn.Sequential():add(nn.Linear(10, 2)):add(nn.Exp())
+  local modelMean2 = nn.Sequential():add(nn.Linear(15, 1))
+  local modelStdev2 = nn.Sequential():add(nn.Linear(15, 1)):add(nn.Exp())
   local model2 = nn.ConcatTable()
   model2:add(modelMean2):add(modelStdev2)
 
-  local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Tanh()):add(model2)
+  local model = nn.Sequential():add(nn.Linear(10, 15)):add(nn.Tanh()):add(model2)
   --local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Sigmoid()):add(nn.Linear(10, 8)):add(nn.Tanh()):add(nn.Linear(8,2))
 
 
 
-  local policy = rl.GaussianPolicy(2)
+  local policy = rl.GaussianPolicy(1)
   local optimizer = rl.StochasticGradientDescent(model:getParameters())
   agent = rl.GPOMDP(model, policy, optimizer)
 
@@ -46,11 +46,10 @@ function buildAgent(learningRate)
 end
 
 
-function init(numAttackers, size, offset, defenderStart, defenderLength)
-  sim = Football(numAttackers, size, offset, defenderStart, defenderLength)
-
+function init(numLions, size)
+  sim = serengeti.Serengeti(numLions, size)
   -- put the four identical agents into the table
-  for i = 1,1 do
+  for i = 1,numLions do
     table.insert(agents, buildAgent(learningRate))
   end
 
@@ -77,10 +76,10 @@ function step(iterationsLimit, trajectoriesLimit)
 
   --print("num actions " .. #actions[1])
 
-	local action1, action2 = actions[1][1], actions[1][2]
-	
 
-  local r, sprime, t = sim:step({{action1}, {action2}}) -- take a step for four lions
+
+
+  local r, sprime, t = sim:step(actions) -- take a step for four lions
 
   utils.callFunctionOnObjects("step", agents, {{state, r}})
 
@@ -109,7 +108,7 @@ function step(iterationsLimit, trajectoriesLimit)
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 
-      print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
+    print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
       averages[trainingCounter] = (averageReward/trajectoriesLimit)
       numSteps = 0
       averageReward = 0
@@ -145,14 +144,14 @@ local offset = 0
 local defenderStart = 0
 local defenderLength = .25
 function main()
-  local sim = init(numAttackers, size, offset, defenderStart, defenderLength)
+  local sim = init(4, 10)
 
   local finished = false
 
   while not finished do
     finished = step(iterations, sampleSize)
   end
-  writedata("singleAgentGPOMDP.out")
+  writedata("multiagentGPOMDP.out")
   print("finished writing")
 
 end
