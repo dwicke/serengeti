@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.0001
+local learningRate = 0.01
 local otherRate = 0.0005
 local agents = {}
 local state = nil
@@ -31,9 +31,9 @@ function buildAgent(learningRate, otherLR)
   local agent = rl.LinearIncrementalDPG(model1, optimizer1, "Q", 1, 6, 1)
   agent:setLearningRate(learningRate)
   --agent:initiateParameters(1.5,2)
-  agent:initiateParameters(0,.001)
+  agent:initiateParameters(0,.3)
   agent:setAdditionalLearningRate(otherLR, otherLR)
-  agent:setActionStdev(.0001)
+  agent:setActionStdev(.1)
 
   return agent
 end
@@ -96,6 +96,10 @@ function doRun()
   return r, t
 end
 
+function reset()
+  state = torch.Tensor(sim:reset())
+end
+
 function writedata(filename)
   file = io.open (filename, "w")
 
@@ -110,10 +114,10 @@ end
 local iterations = 3500
 local sampleSize = 50
 local numAttackers = 2
-local size = 1
+local size = 3
 local offset = 0
 local defenderStart = 0
-local defenderLength = .25
+local defenderLength = .75
 function main()
   local sim = init(numAttackers, size, offset, defenderStart, defenderLength)
 
@@ -128,4 +132,4 @@ function main()
 end
 
 
-main()
+--main()

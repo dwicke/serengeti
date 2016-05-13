@@ -2,8 +2,12 @@ package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 package.path = package.path..";../../../PolicyGradient/src/?/init.lua"
 require 'torch'
-require 'multiagentGPOMDPTest'
-
+local isdpg = true
+if isdpg then
+  require 'testdpg'
+else
+  require 'multiagentGPOMDPTest'
+end
 
 local stepInteval = nil
 local stepTimer = nil
@@ -27,10 +31,12 @@ local scale = 100
 
 -- gets called once at the very beginning
 function love.load()
-  nets = loadNetworks(numAttackers)
-  s = initWithNetwork(numAttackers, fieldSize, offset, defenderStart, defenderLength, nets)
+  --nets = loadNetworks(numAttackers)
+  --s = initWithNetwork(numAttackers, fieldSize, offset, defenderStart, defenderLength, nets)
 
-  stepInteval = 0.5 -- second
+  s = init(numAttackers, fieldSize, offset, defenderStart, defenderLength)
+
+  stepInteval = 0.05 -- second
   stepTimer = stepInteval
 end
 
@@ -40,7 +46,18 @@ function love.update(dt)
   -- time is up, need to take a step
   if stepTimer < 0 then
     -- one step in simulation
-    step(iterations, sampleSize)
+    if isdpg then
+      local r, t = doRun()
+      if t or numIters == 20 then
+        term = true
+        reset()
+        --print("avg rew = " .. totReward)
+      end -- end if
+    else
+      step(iterations, sampleSize)
+    end
+
+
 
 
     -- reset the timer
