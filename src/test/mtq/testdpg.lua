@@ -6,7 +6,7 @@ require 'nn'
 require 'rl'
 
 local game = require 'mtq.MaxTwoQuadratic'
-game.stochastic = true
+game.stochastic = false
 
 function makeModel(learningRate, alr, vlr)
 
@@ -15,7 +15,7 @@ function makeModel(learningRate, alr, vlr)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
 	local agent1 = rl.LinearIncrementalDPG(model1, optimizer1, "Q", 1, 1, 1)
 	agent1:setLearningRate(learningRate)
-	agent1:initiateParameters(1.5,2)
+	agent1:initiateParameters(0.8,1.2)
 	agent1:setAdditionalLearningRate(alr, vlr)
 	agent1:setActionStdev(5)
 
@@ -26,7 +26,7 @@ function makeModel(learningRate, alr, vlr)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
 	local agent2 = rl.LinearIncrementalDPG(model2, optimizer2, "Q", 1, 1, 1)
 	agent2:setLearningRate(learningRate)
-	agent2:initiateParameters(1.5,2)
+	agent2:initiateParameters(0.8,1.2)
 	agent2:setAdditionalLearningRate(alr, vlr)
 	agent2:setActionStdev(5)
 

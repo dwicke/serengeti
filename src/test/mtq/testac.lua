@@ -1,119 +1,107 @@
--- test script for using actor critic model in mtq problem
+package.path = package.path..";../../?/init.lua"
+package.path = package.path..";../../?.lua"
 
 require 'torch'
 require 'nn'
 require 'rl'
 
 local game = require 'mtq.MaxTwoQuadratic'
+game.stochastic = false
 
-function makeModel(learningRate)
-	-- the model, input is just a single number as the state number
-	-- than we do a linearly transformation and then output three values and squash them into a distribution
-	local modelMean1 = nn.Sequential():add(nn.Linear(1, 1))
-	local modelStdev1 = nn.Sequential():add(nn.Linear(1, 1)):add(nn.Exp())
-	local model1 = nn.ConcatTable()
-	model1:add(modelMean1)
-	model1:add(modelStdev1)
+function makeModel(learningRate, alr, vlr)
+
 	
-	local policy1 = rl.GaussianPolicy(1)
+--	local modelMean1 = nn.Sequential():add(nn.Linear(1, 1))
+--	local modelStdev1 = nn.Sequential():add(nn.Linear(1, 1)):add(nn.Exp())
+--	local model1 = nn.ConcatTable()
+--	model1:add(modelMean1)
+--	model1:add(modelStdev1)
+	
+	local model1 = nn.Sequential():add(nn.Linear(1,1))
+	local policy1 = rl.GaussianPolicy(1,6)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
-	local agent1 = rl.ActorCritic(model1, policy1, optimizer1)
+	local agent1 = rl.ActorCritic(model1, policy1, optimizer1, 1, 1)
 	agent1:setLearningRate(learningRate)
-	agent1:initiateParameters(0.5,1)
-	
-	
-	local modelMean2 = nn.Sequential():add(nn.Linear(1, 1))
-	local modelStdev2 = nn.Sequential():add(nn.Linear(1, 1)):add(nn.Exp())
-	local model2 = nn.ConcatTable()
-	model2:add(modelMean2)
-	model2:add(modelStdev2)
-	
-	local policy2 = rl.GaussianPolicy(1)
+	agent1:initiateParameters(0.5,1.0)
+	agent1:setAdditionalLearningRate(alr, vlr)
+
+
+--	local modelMean2 = nn.Sequential():add(nn.Linear(1, 1))
+--	local modelStdev2 = nn.Sequential():add(nn.Linear(1, 1)):add(nn.Exp())
+--	local model2 = nn.ConcatTable()
+--	model2:add(modelMean2)
+--	model2:add(modelStdev2)
+
+	local model2 = nn.Sequential():add(nn.Linear(1,1))
+	local policy2 = rl.GaussianPolicy(1,6)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
-	local agent2 = rl.ActorCritic(model2, policy2, optimizer2)
+	local agent2 = rl.ActorCritic(model2, policy2, optimizer2, 1, 1)
 	agent2:setLearningRate(learningRate)
-	agent2:initiateParameters(0.5,1)
+	agent2:initiateParameters(0.5,1.0)
+	agent2:setAdditionalLearningRate(alr, vlr)
+
 	
 	return agent1, agent2
 end
 
 
 function main()
-	
-	
-	local agent1, agent2 = makeModel(0.03)
-	
+	local agent1, agent2 = makeModel(0.00003, 0.00005, 0.00005)
 	local state = torch.Tensor({1})
 	
 	print("model1")
 	local temp1 = agent1.model:forward(state)
 	print(temp1[1])
-	print(temp1[2])
+	--print(temp1[2])
 	print("model2")
 	local temp2 = agent2.model:forward(state)
 	print(temp2[1])
-	print(temp2[2])
+	--print(temp2[2])
 	
-	-- learn 40000 step
-	for i = 1,40000 do
-		local average1, average2 = 0,0
-		-- repeat 100 trials
-		
+	for i = 1,40000*50 do
 		local action1 = agent1:getAction(state)[1]
 		local action2 = agent2:getAction(state)[1]
+--		print("action1 is")
+--		print(action1)
+--		print("action2 is")
+--		print(action2)
+		local r, _ = game:step(action1,action2)
+		--local r, _ = game:step(action1,-10)
 		
-		local r, _ = game:step(agent1:getAction(state)[1])
+		local verbose = false
+--		if i > 40000 then
+--			verbose = true
+--		end
+		agent1:learn(state, r, nil)
+		agent2:learn(state, r, nil)
 		
-		agent1:learn()
 		
 		
-		for j = 1,100 do
-			agent1:startTrial()
-			agent2:startTrial()
-			local action1 = agent1:getAction(state)[1]
-			local action2 = agent2:getAction(state)[1]
---			print("action1 is")
---			print(action1)
---			print("action2 is")
---			print(action2)
-			--local r, _ = game:step(agent1:getAction(state)[1],agent2:getAction(state)[1])
-			local r, _ = game:step(agent1:getAction(state)[1],-10)
---			if i > 2500 then
---				print(action1)
---			end
-			agent1:step(state, r)
-			agent2:step(state, r)
-			agent1:endTrial()
-			agent2:endTrial()
-			average1 = average1 + r
-			average2 = average2 + r
-		end
-		agent1:learn(nil, nil)
-		agent2:learn(nil, nil)
-		average1 = average1/100
-		average2 = average2/100
-		if i%50==0 then
-			--print("the norm of gradient is "..optimizer1.grads:norm().." and "..optimizer2.grads:norm())
-			print("iteration" .. i .. ", average is: "..average1)
+		if i%(50*10)==0 then
+			print("iteration "..i)
 			print("model1")
+			--print(agent1.optimizer.params)
 			local temp1 = agent1.model:forward(state)
 			print(temp1[1])
-			print(temp1[2])
+			--print(temp1[2])
 			print("model2")
+			--print(agent2.optimizer.params)
 			local temp2 = agent2.model:forward(state)
 			print(temp2[1])
-			print(temp2[2])
+			--print(temp2[2])
 		end
+		
 	end
 	
 	print("model1")
 	local temp1 = agent1.model:forward(state)
 	print(temp1[1])
-	print(temp1[2])
+	--print(temp1[2])
 	print("model2")
 	local temp2 = agent2.model:forward(state)
 	print(temp2[1])
-	print(temp2[2])
+	--print(temp2[2])
+
 	
 
 
