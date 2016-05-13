@@ -10,7 +10,7 @@ require 'serengeti'
 
 local sim = nil
 
-local learningRate = 0.00001
+local learningRate = 0.001
 
 local agents = {}
 local state = nil
@@ -90,7 +90,7 @@ function step(iterationsLimit, trajectoriesLimit)
   state = torch.Tensor(sprime)
   numIters = numIters + 1
   -- for episodic method
-  if t then
+  if t or numIters == 10 then
     utils.callFunctionOnObjects("endTrial", agents)
     --sim:reset()
     --if t then
@@ -136,7 +136,7 @@ function writedata(filename)
 end
 
 
-local iterations = 3500
+local iterations = 1500
 local sampleSize = 50
 local numAttackers = 2
 local size = 1
@@ -144,7 +144,7 @@ local offset = 0
 local defenderStart = 0
 local defenderLength = .25
 function main()
-  local sim = init(4, 10)
+  local sim = init(4, 9)
 
   local finished = false
 

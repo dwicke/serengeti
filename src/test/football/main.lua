@@ -2,7 +2,7 @@ package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 package.path = package.path..";../../../PolicyGradient/src/?/init.lua"
 require 'torch'
-require 'singleAgentTest'
+require 'multiagentGPOMDPTest'
 
 
 local stepInteval = nil
@@ -17,19 +17,20 @@ local defenderStart = 2
 local defenderLength = 6]]--
 
 local numAttackers = 2
-local fieldSize = 1
+local fieldSize = 3
 local offset = 0
 local defenderStart = 0
-local defenderLength = .25
+local defenderLength = .75
 
 local circleRadius = .15
 local scale = 100
 
 -- gets called once at the very beginning
 function love.load()
-  s = init(numAttackers, fieldSize, offset, defenderStart, defenderLength)
+  nets = loadNetworks(numAttackers)
+  s = initWithNetwork(numAttackers, fieldSize, offset, defenderStart, defenderLength, nets)
 
-  stepInteval = 0.05 -- second
+  stepInteval = 0.5 -- second
   stepTimer = stepInteval
 end
 
@@ -40,6 +41,7 @@ function love.update(dt)
   if stepTimer < 0 then
     -- one step in simulation
     step(iterations, sampleSize)
+
 
     -- reset the timer
     stepTimer = stepInteval
@@ -56,6 +58,7 @@ function love.draw()
 
     local last = 0.0
     for i, atk in ipairs(s:getAttackers()) do
+      love.graphics.setColor(255, 255 * (i %2),0)
       love.graphics.circle("fill", atk:getX()*scale, atk:getY()*scale, circleRadius * scale, 100)
     end
 
@@ -67,6 +70,7 @@ function love.draw()
     for i=1, #pts do
       if (i % 2) == 1 then
         love.graphics.line(pts[i][1]*scale, pts[i][2]*scale, pts[i+1][1]*scale, pts[i+1][2]*scale)
+
       end
     end
 

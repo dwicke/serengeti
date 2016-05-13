@@ -10,7 +10,7 @@ require 'serengeti'
 
 local sim = nil
 
-local learningRate = 0.00001
+local learningRate = 0.001
 
 local agents = {}
 local state = nil
@@ -144,14 +144,14 @@ local offset = 0
 local defenderStart = 0
 local defenderLength = .25
 function main()
-  local sim = init(4, 10)
+  local sim = init(4, 9)
 
   local finished = false
 
   while not finished do
     finished = step(iterations, sampleSize)
   end
-  writedata("singleAgentGPOMDP.out")
+  writedata("singleAgentGPOMDP2.out")
   print("finished writing")
 
 end

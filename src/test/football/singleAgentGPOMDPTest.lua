@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.00001
+local learningRate = 0.0001
 
 local agents = {}
 local state = nil

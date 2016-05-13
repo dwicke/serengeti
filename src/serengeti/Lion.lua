@@ -14,9 +14,9 @@ function Lion:__init(maxStep, field)
 end
 
 function Lion:reset(xpos, ypos, theta)
-	self.xpos = 0--xpos
-	self.ypos = 0--ypos
-	self.theta = 0--theta
+	self.xpos = xpos
+	self.ypos = ypos
+	self.theta = theta
 end
 
 function Lion:getX()

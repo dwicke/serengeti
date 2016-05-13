@@ -17,8 +17,8 @@ end
 
 
 function Gazelle:reset(xpos, ypos)
-	self.xpos = 0--xpos
-	self.ypos = self.maxFieldLength / 2-- ypos
+	self.xpos = xpos
+	self.ypos = ypos
 	self.dead = -1
 end
 

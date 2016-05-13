@@ -10,7 +10,7 @@ require 'football'
 
 local sim = nil
 
-local learningRate = 0.0003
+local learningRate = 0.0001
 local otherRate = 0.0005
 local agents = {}
 local state = nil
@@ -26,14 +26,14 @@ local averages = {}
 function buildAgent(learningRate, otherLR)
 
   --local model1 = nn.Sequential():add(nn.Linear(6,1))
-  local model1 = nn.Sequential():add(nn.Linear(6, 3)):add(nn.Tanh()):add(nn.Linear(3,1))
+  local model1 = nn.Sequential():add(nn.Linear(6, 4)):add(nn.Tanh()):add(nn.Linear(4,1))
   local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
   local agent = rl.LinearIncrementalDPG(model1, optimizer1, "Q", 1, 6, 1)
   agent:setLearningRate(learningRate)
   --agent:initiateParameters(1.5,2)
-  agent:initiateParameters(0,.1)
+  agent:initiateParameters(0,.001)
   agent:setAdditionalLearningRate(otherLR, otherLR)
-  agent:setActionStdev(.1)
+  agent:setActionStdev(.0001)
 
   return agent
 end
@@ -70,12 +70,12 @@ function step(numRuns, numSamples)
           term = true
           state = torch.Tensor(sim:reset())
           sampleTot = sampleTot + (totReward / numIters)
-          print("avg rew = " .. totReward/numIters)
+          --print("avg rew = " .. totReward/numIters)
         end -- end if
       end -- end while
     end -- end sampleJ for
     averages[runI] = sampleTot / numSamples
-    --print("average of run ".. runI .. " is: " .. averages[runI])
+    print("average of run ".. runI .. " is: " .. averages[runI])
   end -- end runI for
 
 end

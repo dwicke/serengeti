@@ -3,6 +3,8 @@ require 'torch'
 
 local Serengeti = torch.class('serengeti.Serengeti')
 
+	local a = {0,1,1,0}
+
 -- Constructor
 function Serengeti:__init(numLions, size)
 
@@ -20,25 +22,33 @@ function Serengeti:__init(numLions, size)
 	self.lions = {}
 	for i = 1, self.numLions do
 		self.lions[i] = Lion(self.lionJump, self.field)
+		self.lions[i]:reset(self.maxPosition * (i % 2) + 3 * -1 * (i % 2), (self.maxPosition) * a[i] + 3 * -1 * (i % 2), math.pi / 2)
 	end
 	
 	self.gazelle = Gazelle(self.max, self.lions, self.field, self.gazelleJump)
+	self.gazelle:reset(self.maxPosition / 4,self.maxPosition / 2)
 end
 
 
 -- set the position and velocity of the agents
 function Serengeti:reset()
 
+
 	-- random put the lions and gazelle
 	for i = 1, self.numLions do
-		self.lions[i]:reset(torch.uniform(self.minPosition,self.maxPosition), 
-			torch.uniform(self.minPosition,self.maxPosition),
-			math.random()*2*math.pi)
+		-- self.lions[i]:reset(torch.uniform(self.minPosition, self.maxPosition),
+		-- 	torch.uniform(self.minPosition,self.maxPosition),
+		-- 	math.random()*2*math.pi)
+
+		-- i = 1 (max-2, 0)
+		-- i = 2 (0, max)
+		-- i = 3 (max, max)
+		-- i = 4 (0, 0)
+		self.lions[i]:reset(self.maxPosition * (i % 2) + 3 * -1 * (i % 2), (self.maxPosition) * a[i] + 3 * -1 * a[i], math.pi / 2)
 		--print("lions i = " .. i .. " x = " ..self.lions[i]:getX())
 	end
 
-	self.gazelle:reset(torch.uniform(self.minPosition,self.maxPosition), 
-		torch.uniform(self.minPosition,self.maxPosition))
+	self.gazelle:reset(self.maxPosition / 4,self.maxPosition / 2)
 		
 	self.terminal = false
 

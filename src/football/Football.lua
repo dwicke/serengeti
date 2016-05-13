@@ -13,6 +13,7 @@ function Football:__init(numAttackers, size, offset, defenderStart, defenderLeng
   self.field = ContinuousField(size, size)
   self.defenderLength = defenderLength
   self.numAttackers = numAttackers
+  self.winner = -1
   self.attackers = {}
   for i = 1, numAttackers do
     self.attackers[i] = Attacker(self.size, self.field, self.size / i, self.size - self.offset)
@@ -53,10 +54,14 @@ function Football:step(actions)
   -- then step the attackers
   for i, a in ipairs(self.attackers) do
     reward, terminate = a:step(actions[i], self.defender)
-    r = r + reward
+    if reward < r then
+      r = reward
+    end
     t = t or terminate -- terminated if one of the attackers reached endzone
     if t == true then
       --print("REACHED ENDZONE!!")
+      r = reward
+      self.winner = i
       break
     end
   end
@@ -91,4 +96,8 @@ end
 
 function Football:getDefenderPoints()
   return self.defender:getDefenderPoints()
+end
+
+function Football:getWinner()
+  return self.winner
 end
