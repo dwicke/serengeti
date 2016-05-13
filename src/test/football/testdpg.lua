@@ -26,7 +26,7 @@ local averages = {}
 function buildAgent(learningRate, otherLR)
 
   --local model1 = nn.Sequential():add(nn.Linear(6,1))
-  local model1 = nn.Sequential():add(nn.Linear(6, 4)):add(nn.Tanh()):add(nn.Linear(4,1))
+  local model1 = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Tanh()):add(nn.Linear(10,1))
   local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
   local agent = rl.LinearIncrementalDPG(model1, optimizer1, "Q", 1, 6, 1)
   agent:setLearningRate(learningRate)
@@ -69,10 +69,10 @@ function step(numRuns, numSamples)
         if t or numIters == 20 then
           term = true
           state = torch.Tensor(sim:reset())
-          sampleTot = sampleTot + (totReward / numIters)
-          --print("avg rew = " .. totReward/numIters)
+          --print("avg rew = " .. totReward)
         end -- end if
       end -- end while
+      sampleTot = sampleTot + totReward
     end -- end sampleJ for
     averages[runI] = sampleTot / numSamples
     print("average of run ".. runI .. " is: " .. averages[runI])

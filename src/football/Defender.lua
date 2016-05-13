@@ -35,9 +35,9 @@ function Defender:step()
     end
   end
   --print(sign)
-  print(self.xpos)
+  --print(self.xpos)
   self.xpos = self.field:stx(self.xpos + sign)
-  print(self.xpos)
+  --print(self.xpos)
 end
 
 -- returns a set of four points so defined so that the first two points correspond

@@ -68,13 +68,13 @@ function step(numRuns, numSamples)
         if t or numIters == 20 then
           term = true
           state = torch.Tensor(sim:reset())
-          sampleTot = sampleTot + (totReward / numIters)
-          print("avg rew = " .. totReward/numIters)
+          --print("avg rew = " .. totReward)
         end -- end if
       end -- end while
+      sampleTot = sampleTot + totReward
     end -- end sampleJ for
     averages[runI] = sampleTot / numSamples
-    --print("average of run ".. runI .. " is: " .. averages[runI])
+    print("average of run ".. runI .. " is: " .. averages[runI])
   end -- end runI for
 
 end
