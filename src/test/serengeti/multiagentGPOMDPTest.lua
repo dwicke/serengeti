@@ -1,12 +1,11 @@
--- Does not adapt the standard deviation
-package.path = package.path..";../?/init.lua"
-package.path = package.path..";../?.lua"
+package.path = package.path..";../../?/init.lua"
+package.path = package.path..";../../?.lua"
 
 require 'torch'
 require 'rl'
 require 'nn'
 require 'utils'
-require 'football'
+require 'serengeti'
 
 
 local sim = nil
@@ -20,11 +19,22 @@ local trialCounter = 0
 local trainingCounter = 0
 local averageReward = 0
 local numSteps = 0
-
+local numIters = 0
+local maxIters = 100
+local averages = {}
 
 function buildAgent(learningRate)
-  local model = nn.Sequential():add(nn.Linear(6, 4)):add(nn.Sigmoid()):add(nn.Linear(4,1))
-  local policy = rl.GaussianPolicy(1, 1.0)
+  local modelMean2 = nn.Sequential():add(nn.Linear(15, 1))
+  local modelStdev2 = nn.Sequential():add(nn.Linear(15, 1)):add(nn.Exp())
+  local model2 = nn.ConcatTable()
+  model2:add(modelMean2):add(modelStdev2)
+
+  local model = nn.Sequential():add(nn.Linear(10, 15)):add(nn.Tanh()):add(model2)
+  --local model = nn.Sequential():add(nn.Linear(6, 10)):add(nn.Sigmoid()):add(nn.Linear(10, 8)):add(nn.Tanh()):add(nn.Linear(8,2))
+
+
+
+  local policy = rl.GaussianPolicy(1)
   local optimizer = rl.StochasticGradientDescent(model:getParameters())
   agent = rl.GPOMDP(model, policy, optimizer)
 
@@ -36,11 +46,10 @@ function buildAgent(learningRate)
 end
 
 
-function init(numAttackers, size, offset, defenderStart, defenderLength)
-  sim = Football(numAttackers, size, offset, defenderStart, defenderLength)
-
+function init(numLions, size)
+  sim = serengeti.Serengeti(numLions, size)
   -- put the four identical agents into the table
-  for i = 1,2 do
+  for i = 1,numLions do
     table.insert(agents, buildAgent(learningRate))
   end
 
@@ -65,6 +74,11 @@ function step(iterationsLimit, trajectoriesLimit)
   local actions = utils.callFunctionOnObjects("getAction", agents, {{state}})
   --print("post action")
 
+  --print("num actions " .. #actions[1])
+
+
+
+
   local r, sprime, t = sim:step(actions) -- take a step for four lions
 
   utils.callFunctionOnObjects("step", agents, {{state, r}})
@@ -74,11 +88,16 @@ function step(iterationsLimit, trajectoriesLimit)
 
   -- go the the next state
   state = torch.Tensor(sprime)
-
+  numIters = numIters + 1
   -- for episodic method
-  if t then
+  if t or numIters == 10 then
     utils.callFunctionOnObjects("endTrial", agents)
-    trialCounter = trialCounter + 1
+    --sim:reset()
+    --if t then
+    sim.terminal = true
+      trialCounter = trialCounter + 1
+    --end
+    numIters = 0
 
     -- only learn after so many trajectories collected
     if trialCounter == trajectoriesLimit then
@@ -89,7 +108,8 @@ function step(iterationsLimit, trajectoriesLimit)
       trainingCounter = trainingCounter + 1
       trialCounter = 0
 
-      print("average is ".. (averageReward/trajectoriesLimit))
+    print("iteration: ".. trainingCounter..", average is ".. (averageReward/trajectoriesLimit))
+      averages[trainingCounter] = (averageReward/trajectoriesLimit)
       numSteps = 0
       averageReward = 0
 
@@ -106,4 +126,36 @@ function step(iterationsLimit, trajectoriesLimit)
 end
 
 
+function writedata(filename)
+  file = io.open (filename, "w")
+
+  for i, v in ipairs(averages) do
+    file:write(i .. ", " .. v .. "\n")
+  end
+  file:close()
+end
+
+
+local iterations = 1500
+local sampleSize = 50
+local numAttackers = 2
+local size = 1
+local offset = 0
+local defenderStart = 0
+local defenderLength = .25
+function main()
+  local sim = init(4, 9)
+
+  local finished = false
+
+  while not finished do
+    finished = step(iterations, sampleSize)
+  end
+  writedata("multiagentGPOMDP.out")
+  print("finished writing")
+
+end
+
+
+main()
 

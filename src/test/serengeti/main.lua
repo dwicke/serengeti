@@ -2,7 +2,7 @@ package.path = package.path..";../?/init.lua"
 package.path = package.path..";../?.lua"
 package.path = package.path..";../../../PolicyGradient/src/?/init.lua"
 require 'torch'
-require 'control'
+require 'multiagentGPOMDPTest'
 
 
 local stepInteval = nil

@@ -3,10 +3,10 @@ package.path = package.path..";../../?.lua"
 
 
 
-require 'test.football.control'
+require 'test.football.testgpomdp'
 
 
-local iterations = 40000
+local iterations = 3500
 local sampleSize = 50
 local numAttackers = 2
 local size = 1
@@ -21,6 +21,8 @@ function main()
   while not finished do
     finished = step(iterations, sampleSize)
   end
+  writedata("multiagentFixedStdGPOMDP.out")
+  print("finished writing")
 
 end
 
