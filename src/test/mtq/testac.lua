@@ -22,7 +22,7 @@ function makeModel(learningRate, alr, vlr)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
 	local agent1 = rl.ActorCritic(model1, policy1, optimizer1, 1, 1)
 	agent1:setLearningRate(learningRate)
-	agent1:initiateParameters(0.5,1.0)
+	agent1:initiateParameters(-0.08,0.08)
 	agent1:setAdditionalLearningRate(alr, vlr)
 
 
@@ -37,7 +37,7 @@ function makeModel(learningRate, alr, vlr)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
 	local agent2 = rl.ActorCritic(model2, policy2, optimizer2, 1, 1)
 	agent2:setLearningRate(learningRate)
-	agent2:initiateParameters(0.5,1.0)
+	agent2:initiateParameters(-0.08,0.08)
 	agent2:setAdditionalLearningRate(alr, vlr)
 
 	
@@ -52,11 +52,9 @@ function main()
 	print("model1")
 	local temp1 = agent1.model:forward(state)
 	print(temp1[1])
-	--print(temp1[2])
 	print("model2")
 	local temp2 = agent2.model:forward(state)
 	print(temp2[1])
-	--print(temp2[2])
 	
 	for i = 1,40000*50 do
 		local action1 = agent1:getAction(state)[1]
@@ -69,9 +67,7 @@ function main()
 		--local r, _ = game:step(action1,-10)
 		
 		local verbose = false
---		if i > 40000 then
---			verbose = true
---		end
+
 		agent1:learn(state, r, nil)
 		agent2:learn(state, r, nil)
 		
@@ -80,15 +76,15 @@ function main()
 		if i%(50*10)==0 then
 			print("iteration "..i)
 			print("model1")
-			--print(agent1.optimizer.params)
 			local temp1 = agent1.model:forward(state)
 			print(temp1[1])
-			--print(temp1[2])
 			print("model2")
-			--print(agent2.optimizer.params)
 			local temp2 = agent2.model:forward(state)
 			print(temp2[1])
-			--print(temp2[2])
+		end
+		
+		if i%50000 == 0 then
+			collectgarbage()
 		end
 		
 	end
@@ -96,11 +92,9 @@ function main()
 	print("model1")
 	local temp1 = agent1.model:forward(state)
 	print(temp1[1])
-	--print(temp1[2])
 	print("model2")
 	local temp2 = agent2.model:forward(state)
 	print(temp2[1])
-	--print(temp2[2])
 
 	
 

@@ -1,4 +1,4 @@
-searchMethod:search(self.critic, sampleBatch[i][3], self.searchPoint)
+
 
 require 'torch'
 require 'luawrapper'
