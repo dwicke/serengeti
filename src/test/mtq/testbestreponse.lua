@@ -22,7 +22,7 @@ function makeModel(learningRate, qlr)
 	
 	local model1 = nn.Sequential():add(nn.Linear(1,1))
 	local critic1 = nn.Sequential():add(nn.Linear(3, 8)):add(nn.Tanh()):add(nn.Linear(8, 1))
-	local search1 = LBFGSB.new(1, 2, {30, 30}, {-30,-30})
+	local search1 = LBFGSB.new(1, 2, {20, 20}, {-20,-20})
 	local policy1 = rl.GaussianPolicy(1, 10)
 	local buffer1 = TransitionTable.new({maxSize = 500,numActor = 2,actionDim = 1,stateDim = 1})
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
@@ -33,7 +33,7 @@ function makeModel(learningRate, qlr)
 		
 	local model2 = nn.Sequential():add(nn.Linear(1,1))
 	local critic2 = nn.Sequential():add(nn.Linear(3, 8)):add(nn.Tanh()):add(nn.Linear(8, 1))
-	local search2 = LBFGSB.new(1, 2, {30, 30}, {-30,-30})
+	local search2 = LBFGSB.new(1, 2, {20, 20}, {-20,-20})
 	local policy2 = rl.GaussianPolicy(1, 10)
 	local buffer2 = TransitionTable.new({maxSize = 500,numActor = 2,actionDim = 1,stateDim = 1})
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
@@ -50,7 +50,7 @@ end
 
 
 function main()
-	local agent1, agent2 = makeModel(0.00000001, 0.008)
+	local agent1, agent2 = makeModel(0.00000001, 0.00008)
 	local state = torch.Tensor({1})
 	
 	print("model1")

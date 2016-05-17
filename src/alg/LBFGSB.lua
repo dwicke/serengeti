@@ -65,13 +65,15 @@ function LBFGSB:search(func, partial, input, funcGrads, iteration)
 		end
 	end
 	
---	print("maxValue is"..maxValue)
+	print("maxValue is "..maxValue..", optimal is "..optimal[1]..", "..optimal[2])
 --	for i = 1,#optimal do
 --		print("optimal is"..optimal[i])
 --	end
 	
-	
+
+
 	assert(maxValue ~= -100000000)
+	
 	
 	return maxValue, optimal
 	

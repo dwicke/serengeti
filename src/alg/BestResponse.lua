@@ -115,7 +115,7 @@ function BestResponse:updateQValue(sampleBatch, searchPoint, featureSize, jointA
 --		print("r is ")
 --		print(sampleBatch[i][2])
 --	end
-	print("sampleBatch num is "..#sampleBatch)
+	--print("sampleBatch num is "..#sampleBatch)
 	
 	for i = 1, #sampleBatch do
 		xMatrix[i]:copy(sampleBatch[i][1]) -- prepare the x
