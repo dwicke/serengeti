@@ -15,6 +15,7 @@ function BestResponse:__init(model, actor, optimizer, agentNum, critic, searchPo
 	self.searchPoints = searchPoints
 	self.searchMethod = searchMethod
 	self.replay = replay 
+	self.qlr = nil
 end
 
 --add another learning rate for  Q-learning
@@ -37,7 +38,7 @@ function BestResponse:getAction(s)
 end
 
 
-function BestResponse:learn(s, r, sprime, actions, i)
+function BestResponse:learn(s, r, sprime, actions, iteration)
 	-- since our gradient of the policy may get changed due to the computation of compatible feature,
 	-- we have to save that first
 	-- first clear out the accumulated gradients	
@@ -57,20 +58,31 @@ function BestResponse:learn(s, r, sprime, actions, i)
 				k = k+1
 			end
 		end
+	else
+		actionTable = actions -- actions is already a table of elements
 	end
+	
 	local featureSize = s:nElement()
 	local jointActionSize = #actionTable
 	self.replay:add(s, torch.Tensor(actions), r, sprime, t)
-	local batchSize = 50
+	local batchSize = 100
 	local batch = self.replay:sample(batchSize)
 	-- have computation here, since we are doing a lot of optimization
 	self:updateQValue(batch, self.searchPoint, featureSize, jointActionSize)
 	
 	-- do one more search to find out the optimal action
-	local _, optimalActions = self.searchMethod:search(self.critic, s, self.searchPoint, self.criticGrads) 
+	local _, optimalActions = self.searchMethod:search(self.critic, s, self.searchPoints, self.criticGrads, iteration) 
+	
+	if iteration%500 == 0 then
+		print(_)
+		for j = 1,#optimalActions do
+			print("action "..j.." is ")
+			print(optimalActions[j])
+		end
+	end
 	
 	-- then we replace the action with our action, to determine the on-our-policy Q value
-	optimalActions[i] = actions[i]
+	optimalActions[self.agentNum] = actions[self.agentNum]
 	
 	-- construct the sample 
 	local jointAction = torch.Tensor(optimalActions)
@@ -78,14 +90,15 @@ function BestResponse:learn(s, r, sprime, actions, i)
 	jointActionSize = jointAction:nElement()
 	local input = torch.Tensor(featureSize + jointActionSize)
 	
+	
 	input:narrow(1, 1, featureSize):copy(s)
 	input:narrow(1, 1 + featureSize, jointActionSize):copy(jointAction)
 	
-	local qa = self.critic:forward(torch.Tensor(input))
+	local qa = self.critic:forward(input)
+
 	
-	
-	policyGradient:mul(qa)
-	self.optimizer:gradientAscent(policyGradient)
+--	policyGradient:mul(qa[1]) -- qa is tensor, we convert it to number
+--	self.optimizer:gradientAscent(policyGradient)
 	
 end
 
@@ -96,8 +109,16 @@ function BestResponse:updateQValue(sampleBatch, searchPoint, featureSize, jointA
 	local yVector = torch.Tensor(#sampleBatch,1):fill(0)
 	local xMatrix = torch.Tensor(#sampleBatch, featureSize + jointActionSize)
 	
+--	for i = 1, #sampleBatch do
+--		print("input is")
+--		print(sampleBatch[i][1])
+--		print("r is ")
+--		print(sampleBatch[i][2])
+--	end
+	print("sampleBatch num is "..#sampleBatch)
+	
 	for i = 1, #sampleBatch do
-		xMatrix[i]:copy(sampleBatch[i]) -- prepare the x
+		xMatrix[i]:copy(sampleBatch[i][1]) -- prepare the x
 	end
 	
 	-- compute the q value 
@@ -109,8 +130,10 @@ function BestResponse:updateQValue(sampleBatch, searchPoint, featureSize, jointA
 		local y = 0
 		local r = sampleBatch[i][2]
 		local terminal = sampleBatch[i][4]
+
+		
 		if terminal then
-			y = r
+			yVector[i] = r - qsa[i][1]
 		else
 			-- search the maxq value in state sprime
 			local maxQ, _ = self.searchMethod:search(self.critic, sampleBatch[i][3], self.searchPoint, self.criticGrads) 
@@ -126,7 +149,6 @@ function BestResponse:updateQValue(sampleBatch, searchPoint, featureSize, jointA
 	
 	self.critic:backward(xMatrix, yVector)
 	
-	-- TODO: update W should be careful
 	self.criticParams:add(self.qlr, self.criticGrads)
 end
 

@@ -10,14 +10,14 @@ local LBFGSB = torch.class('LBFGSB')
 function LBFGSB:__init(featureSize, numVariables, upperBounds, lowerBounds)
 	self.featureSize = featureSize
 	self.variable = getInputArray()
-	self.numVariables = numVarialbes
+	self.numVariables = numVariables
 	setNumberVars(numVariables)
 	setUpperBound(upperBounds)
 	setLowerBound(lowerBounds)
 end
 
 -- NOTE: since the C code for LBFGSB is doing minimization, thus, we need to times -1 for f and grads
-function LBFGSB:search(func, partial, input, funcGrads)
+function LBFGSB:search(func, partial, input, funcGrads, iteration)
 	-- first prepare the input for the approximator
 	local inputTensor = torch.Tensor(self.featureSize + self.numVariables):fill(0)
 
@@ -53,9 +53,11 @@ function LBFGSB:search(func, partial, input, funcGrads)
 		end
 
 		local f = func:forward(inputTensor)
-
-		if f > max then
-			max = f
+		
+		local v = f[1]
+		--print("value is "..v)
+		if v > maxValue then
+			maxValue = v
 			optimal = {}
 			for j = 1, self.numVariables do
 				table.insert(optimal, self.variable[j])
@@ -63,9 +65,15 @@ function LBFGSB:search(func, partial, input, funcGrads)
 		end
 	end
 	
-	assert(max ~= -100000000)
+--	print("maxValue is"..maxValue)
+--	for i = 1,#optimal do
+--		print("optimal is"..optimal[i])
+--	end
 	
-	return max, optimal
+	
+	assert(maxValue ~= -100000000)
+	
+	return maxValue, optimal
 	
 end
 
@@ -76,7 +84,7 @@ function LBFGSB:updateValue(inputTensor, func, funcGrads)
 	end
 
 	local f = func:forward(inputTensor)
-	setf(-f)
+	setf(-(f[1]))  -- f is a tensor, we convert it to number
 
 	-- not sure if we need this, but to be safe, we do this
 	funcGrads:zero()
@@ -94,3 +102,6 @@ end
 function LBFGSB:pulse()
 	return pulseLBFGSB()
 end
+
+
+return LBFGSB

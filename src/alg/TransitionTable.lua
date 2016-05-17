@@ -48,9 +48,9 @@ end
 function TransitionTable:get(index)
 	local s = self.s[index]
 	local a = self.a[index]
-	local input = torch.Tensor(s.nElement() + a.nElement())
-	input:narrow(1, 1, s.nElement()):copy(s)
-	input:narrow(1, 1 + s.nElement(), a.nElement()):copy(a)
+	local input = torch.Tensor(s:nElement() + a:nElement())
+	input:narrow(1, 1, s:nElement()):copy(s)
+	input:narrow(1, 1 + s:nElement(), a:nElement()):copy(a)
 	return {input, self.r[index], self.sprime[index], self.t[index]}
 end
 
@@ -61,11 +61,11 @@ function TransitionTable:sample(batchSize)
     
 	if batchSize > self.numEntries then
 		for i = 1, self.numEntries do
-    		buffer.insert(buffer, self:get(i))
+    		table.insert(buffer, self:get(i))
     	end
     else
     	for i = 1,batchSize do
-    		table.insert(buffer, self:simpleOne())
+    		table.insert(buffer, self:sampleOne())
     	end
 	end    
     return buffer
@@ -104,3 +104,6 @@ function TransitionTable:add(s, a, r, sprime, term)
         self.sprime[self.insertIndex] = sprime:clone()
     end
 end
+
+
+return TransitionTable
