@@ -46,7 +46,12 @@ end
 
 
 function TransitionTable:get(index)
-	return {self.s[index], self.a[index], self.r[index], self.sprime[index], self.t[index]}
+	local s = self.s[index]
+	local a = self.a[index]
+	local input = torch.Tensor(s.nElement() + a.nElement())
+	input:narrow(1, 1, s.nElement()):copy(s)
+	input:narrow(1, 1 + s.nElement(), a.nElement()):copy(a)
+	return {input, self.r[index], self.sprime[index], self.t[index]}
 end
 
 function TransitionTable:sample(batchSize)
