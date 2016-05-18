@@ -18,11 +18,11 @@ function makeModel(learningRate, alr, vlr)
 --	model1:add(modelStdev1)
 	
 	local model1 = nn.Sequential():add(nn.Linear(1,1))
-	local policy1 = rl.GaussianPolicy(1,6)
+	local policy1 = rl.GaussianPolicy(1,10)
 	local optimizer1 = rl.StochasticGradientDescent(model1:getParameters())
 	local agent1 = rl.ActorCritic(model1, policy1, optimizer1, 1, 1)
 	agent1:setLearningRate(learningRate)
-	agent1:initiateParameters(-0.08,0.08)
+	agent1:initiateParameters(-0.05,0.05)
 	agent1:setAdditionalLearningRate(alr, vlr)
 
 
@@ -33,11 +33,11 @@ function makeModel(learningRate, alr, vlr)
 --	model2:add(modelStdev2)
 
 	local model2 = nn.Sequential():add(nn.Linear(1,1))
-	local policy2 = rl.GaussianPolicy(1,6)
+	local policy2 = rl.GaussianPolicy(1,10)
 	local optimizer2 = rl.StochasticGradientDescent(model2:getParameters())
 	local agent2 = rl.ActorCritic(model2, policy2, optimizer2, 1, 1)
 	agent2:setLearningRate(learningRate)
-	agent2:initiateParameters(-0.08,0.08)
+	agent2:initiateParameters(-0.05,0.05)
 	agent2:setAdditionalLearningRate(alr, vlr)
 
 	
@@ -46,7 +46,7 @@ end
 
 
 function main()
-	local agent1, agent2 = makeModel(0.00003, 0.00005, 0.00005)
+	local agent1, agent2 = makeModel(0.0003, 0.0005, 0.0005)
 	local state = torch.Tensor({1})
 	
 	print("model1")

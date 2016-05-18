@@ -17,7 +17,7 @@ function makeModel(learningRate, alr, vlr)
 	agent1:setLearningRate(learningRate)
 	agent1:initiateParameters(0.8,1.2)
 	agent1:setAdditionalLearningRate(alr, vlr)
-	agent1:setActionStdev(5)
+	agent1:setActionStdev(9)
 
 	
 	
@@ -28,7 +28,7 @@ function makeModel(learningRate, alr, vlr)
 	agent2:setLearningRate(learningRate)
 	agent2:initiateParameters(0.8,1.2)
 	agent2:setAdditionalLearningRate(alr, vlr)
-	agent2:setActionStdev(5)
+	agent2:setActionStdev(9)
 
 	
 	return agent1, agent2
